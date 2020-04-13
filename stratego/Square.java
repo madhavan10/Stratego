@@ -1,16 +1,43 @@
 package stratego;
 
-public class Square {
+import java.awt.event.MouseAdapter;
+import java.awt.event.MouseEvent;
+
+import javax.swing.JPanel;
+
+@SuppressWarnings("serial")
+public class Square extends JPanel {
+	
 	final int x, y;
 	final boolean isForbidden;
+	
+	
 	boolean isOccupied;
+	
 	Piece occupant;
+	
+	public boolean isForbidden() {
+		return isForbidden;
+	}
 
-	public Square(int x, int y, boolean isForbidden) {
+	public boolean isOccupied() {
+		return isOccupied;
+	}
+	
+	public Piece getOccupant() {
+		return occupant;
+	}
+
+	public Square(int x, int y, boolean forbidden) {
 		this.x = x;
 		this.y = y;
-		this.isForbidden = isForbidden;
+		isForbidden = forbidden;
 		isOccupied = false;
+	}
+	
+	public void setOccupant(Piece occupant) {
+		this.occupant = occupant;
+		isOccupied = true;
 	}
 	
 	public String toString() {

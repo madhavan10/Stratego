@@ -1,17 +1,23 @@
 package stratego;
 
-public class Piece {
+import java.awt.event.MouseAdapter;
+
+import javax.swing.JTextField;
+import javax.swing.TransferHandler;
+
+@SuppressWarnings("serial")
+public class Piece extends JTextField {
 	
-	final static int SPY = 1;
-	final static int STRONGHOLD = 11;
-	final static int FLAG = 0;
+	public final static int SPY = 1;
+	public final static int STRONGHOLD = 11;
+	public final static int FLAG = 0;
 	
-	final int level;
-	final String name;
-	final boolean team;
+	private final int level;
+	private final String name;
+	private final boolean team;
 	
-	boolean isDead;
-	int xPos, yPos;
+	private boolean isDead;
+	//private int xPos, yPos;
 	
 	public Piece(int level, String name, boolean team) {
 		
@@ -20,14 +26,40 @@ public class Piece {
 		this.team = team;
 		
 		isDead = false;
+		
+		setText(this.toString());
+		setEditable(false);
+	}
+	
+	public boolean isDead() {
+		return isDead;
+	}
+
+	public void die() {
+		isDead = true;
+	}
+
+	public int getLevel() {
+		return level;
+	}
+
+	public String getName() {
+		return name;
+	}
+
+	public boolean getTeam() {
+		return team;
 	}
 	
 	public String toString() {
-		String result = name;
-		if(team == Player.HUMAN)
-			result += "(W)";
-		else
-			result += "(B)";
-		return result;
+		return name;
 	}
+
+	/*
+	public void setPos(int x, int y) {
+		xPos = x;
+		yPos = y;
+	}
+	*/
+	
 }
