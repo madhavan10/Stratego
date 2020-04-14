@@ -18,6 +18,7 @@ public class Board extends JPanel implements ActionListener {
 	
 	public static final int NO_OF_PIECES = 40;
 	public static final int BOARD_DIM = 10;
+	public static final int SETUP_TIME = 1000 * 60 * 10;
 	
 	private final Square[][] board = new Square[BOARD_DIM][BOARD_DIM];
 	private final Piece[] whitePieces = new Piece[NO_OF_PIECES];
@@ -36,7 +37,7 @@ public class Board extends JPanel implements ActionListener {
 		isSetupTime = true;
 		selected = null;
 		
-		Timer timer = new Timer(1000 * 60 * 10, this);
+		Timer timer = new Timer(SETUP_TIME, this);
 		timer.setRepeats(false);
 		timer.start();
 	}
@@ -207,12 +208,18 @@ public class Board extends JPanel implements ActionListener {
 	}
 	
 	private boolean isValidMove(Square square1, Square square2) {
-		//TODO
+		if(square2.y == square1.y)
+			if(Math.abs(square2.x - square1.x) == 1)
+				return true;
+		if(square2.x == square1.x)
+			if(Math.abs(square2.y - square1.y) == 1)
+				return true;
+		//TODO warg
 		return false;
 	}
 	
 	private void movePiece(Square square1, Square square2) {
-		//TODO
+		
 	}
 	
 	private class SquareMotionListener extends MouseMotionAdapter {
@@ -234,44 +241,48 @@ public class Board extends JPanel implements ActionListener {
 				return;
 			//System.out.println("Mouse Entered!");
 			Square square = (Square) e.getSource();
-			if(!square.isForbidden()) {
-				if(isSetupTime)
-					if(square.isOccupied())
-						if(square.getOccupant().getTeam() == selected.getOccupant().getTeam())
-							target = square;
-						else
-							target = null;
+			if(square.isForbidden()) {
+				target = null;
+				return;
+			}
+			if(isSetupTime)
+				if(square.isOccupied())
+					if(square.getOccupant().getTeam() == selected.getOccupant().getTeam())
+						target = square;
 					else
 						target = null;
 				else
-					//not setup time
-					if(square.isOccupied())
-						if(square.getOccupant().getTeam() != selected.getOccupant().getTeam())
-							target = square;
-						else
-							//same team
-							target = null;
-					else
-						//target is empty square
-						target = square;
-			}
+					target = null;
 			else
-				//forbidden square
-				target = null;
+				//not setup time
+				if(square.isOccupied())
+					if(square.getOccupant().getTeam() != selected.getOccupant().getTeam())
+						target = square;
+					else
+						//same team
+						target = null;
+				else
+					//target is empty square
+					target = square;
 		}
 		
 		@Override
 		public void mouseReleased(MouseEvent e) {
 			//System.out.println("Mouse Released!");
-			if(target != null)
-				if(isSetupTime)
+			if(target == null) {
+				selected = null;
+				return;
+			}
+				if(isSetupTime) {
 					swapPieces(selected, target);
-				else {
-					if(isValidMove(selected, target))
-						movePiece(selected, target);
+					selected = target = null;
 				}
-			else 
-				System.out.println("no target");
+				else {
+					if(isValidMove(selected, target)) {
+						movePiece(selected, target);
+						selected = target = null;
+					}
+				}
 		}
 		
 	}

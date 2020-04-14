@@ -12,9 +12,9 @@ public class Piece extends JTextField {
 	public final static int STRONGHOLD = 11;
 	public final static int FLAG = 0;
 	
-	private final int level;
-	private final String name;
-	private final boolean team;
+	final int level;
+	final String name;
+	final boolean team;
 	
 	private boolean isDead;
 	//private int xPos, yPos;
