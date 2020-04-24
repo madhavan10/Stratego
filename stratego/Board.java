@@ -228,6 +228,7 @@ public class Board extends JPanel {
 		selected = target = null;
 		repaint();
 		revalidate();
+		output.println("MOVE " + square1.x + "" + square1.y + "" + square2.x + "" + square2.y);
 	}
 	
 	private boolean isValidMove(Square square1, Square square2) {
@@ -294,6 +295,18 @@ public class Board extends JPanel {
 	public void moveOpponentPiece(int x1, int y1, int x2, int y2) {
 		Square square1 = board[x1][y1];
 		Square square2 = board[x2][y2];
+		if(isSetupTime) {
+			//swap
+			Piece tmp = square1.getOccupant();
+			square1.remove(tmp);
+			square1.setOccupant(square2.getOccupant());
+			square1.add(square2.getOccupant());
+			square2.remove(square2.getOccupant());
+			square2.setOccupant(tmp);
+			square2.add(tmp);
+			revalidate();
+			return;
+		}
 		if(!square2.isOccupied()) {
 			square2.setOccupant(square1.getOccupant());
 			square2.setOccupied(true);

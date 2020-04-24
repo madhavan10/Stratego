@@ -25,17 +25,19 @@ public class Stratego extends JFrame {
 
 	/**
 	 * Launch the application.
+	 * @throws IOException 
 	 */
-	public static void main(String[] args) {
+	public static void main(String[] args) throws IOException {
 		if(args.length != 1) {
 			System.err.println("Pass the IP of the Server as the sole command-line argument");
 			return;
 		}
 		final String serverIP = args[0];
+		final Stratego frame = new Stratego(serverIP);
 		EventQueue.invokeLater(new Runnable() {
 			public void run() {
 				try {
-					Stratego frame = new Stratego(serverIP);
+					frame.initUI();
 					frame.setVisible(true);
 					frame.play();
 				} catch (Exception e) {
@@ -47,9 +49,13 @@ public class Stratego extends JFrame {
 	
 	protected void play() {
 		
-		while(in.hasNextLine() ) {
+		while(in.hasNextLine()) {
+			System.out.println("head of loop");
 			String response = in.nextLine();
 			if(response.equals("CHOOSE_TEAM")) {
+				
+				System.out.println("Choose team");
+				
 				messageLabel.setText("Choose Team:");
 				final JButton orc = new JButton("ORC");
 				final JButton human = new JButton("HUMAN");
@@ -75,6 +81,15 @@ public class Stratego extends JFrame {
 				});
 				messagePanel.add(orc);
 				messagePanel.add(human);
+				messagePanel.repaint();
+				messagePanel.revalidate();
+				
+				System.out.println("end of choose team");
+			} else if(response.startsWith("MESSAGE")) {
+				
+				System.out.println(response);
+				
+				messageLabel.setText(response);
 				messagePanel.repaint();
 				messagePanel.revalidate();
 			} else if(response.startsWith("YOUR_TEAM")) {
@@ -113,8 +128,9 @@ public class Stratego extends JFrame {
 				JOptionPane.showMessageDialog(this, "Other player left");
 				break;
 			}
+			System.out.println("end of loop body");
 		}
-		
+		System.out.println("end of method body");
 		
 	}
 
@@ -134,10 +150,9 @@ public class Stratego extends JFrame {
 		socket = new Socket(serverIP, 58901);
 		in = new Scanner(socket.getInputStream());
 		out = new PrintWriter(socket.getOutputStream(), true);
-		initUI();
 	}
 	
-	private void initUI() {
+	public void initUI() {
 		setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
 		setTitle("Stratego");
 		setBounds(100, 100, 768, 768);

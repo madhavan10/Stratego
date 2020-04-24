@@ -44,16 +44,6 @@ public class Game {
 			this.socket = socket;
 		}
 
-		private boolean getTeamSelectionFromClient() throws Exception {
-			while(input.hasNextLine()) {
-				String command = input.nextLine();
-				if(command.startsWith("PICK_TEAM")) {
-					return command.substring(10).equalsIgnoreCase("orc") ? ORC : HUMAN;
-				} 
-			}
-			throw new Exception("Failed to get team selection");
-		}
-
 		@Override
 		public void run() {
 			try {
@@ -99,6 +89,7 @@ public class Game {
 				output.println("CHOOSE_TEAM");
 				team = getTeamSelectionFromClient();
 				player1 = this;
+				System.out.println("Waiting for other player");
 				output.println("MESSAGE Waiting for other player to connect");
 				firstPlayerJoined = true;
 			} else {
@@ -117,7 +108,18 @@ public class Game {
 			if(team == ORC) currentPlayer = this;
 			else currentPlayer = opponent;
 		}
-
+		
+		private boolean getTeamSelectionFromClient() throws Exception {
+			while(input.hasNextLine()) {
+				String command = input.nextLine();
+				if(command.startsWith("PICK_TEAM")) {
+					System.out.println(command);
+					return command.substring(10).equalsIgnoreCase("orc") ? ORC : HUMAN;
+				} 
+			}
+			throw new Exception("Failed to get team selection");
+		}
+		
 		@Override
 		public void actionPerformed(ActionEvent arg0) {
 			isSetupTime = false;
