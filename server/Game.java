@@ -23,13 +23,11 @@ public class Game {
 	}
 	
 	public synchronized void move(int x1, int y1, int x2, int y2, Player player) {
-		if(player != currentPlayer) {
-			player.output.println("MESSAGE Not your turn");
-			return;
+		if(player != currentPlayer && !isSetupTime) {
+			throw new IllegalStateException("MESSAGE Not your turn");
 		}
 		if(player.opponent == null) {
-			player.output.println("MESSAGE You don't have an opponent yet");
-			return;
+			throw new IllegalStateException("MESSAGE You don't have an opponent yet");
 		}
 		currentPlayer = currentPlayer.opponent;
 	}
@@ -81,9 +79,13 @@ public class Game {
 					int y1 = Integer.parseInt(command2.substring(1, 2));
 					int x2 = Integer.parseInt(command2.substring(2, 3));
 					int y2 = Integer.parseInt(command2.substring(3, 4));
-					move(x1, y1, x2, y2, this);
-					output.println("MOVE_OK");
-					opponent.output.println("OPPONENT_MOVED " + command2);
+					try {
+						move(x1, y1, x2, y2, this);
+						output.println("MOVE_OK");
+						opponent.output.println("OPPONENT_MOVED " + command2);
+					} catch(IllegalStateException e) {
+						output.println(e.getMessage());
+					}
 				}
 			}
 		}
@@ -93,6 +95,7 @@ public class Game {
 			output = new PrintWriter(socket.getOutputStream(), true);
 			
 			if(!firstPlayerJoined) {
+				System.out.println("Choose team");
 				output.println("CHOOSE_TEAM");
 				team = getTeamSelectionFromClient();
 				player1 = this;

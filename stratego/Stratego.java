@@ -84,9 +84,17 @@ public class Stratego extends JFrame {
 				setTitle("Stratego " + teamAsStr);
 			} else if(response.startsWith("SETUP")) {
 				int setupTime = Integer.parseInt(response.substring(6));
-				board.setSetupTime(setupTime);
+				messageLabel.setText(setupTime + " minutes to setup");
+				messagePanel.repaint();
+				messagePanel.revalidate();
 			} else if(response.equals("SETUP_TIME_OVER")) {
 				board.setupTimeOver();
+				if(board.getPlayerTeam() == Board.ORC)
+					messageLabel.setText("You start");
+				else
+					messageLabel.setText("Opponent to play");
+				messagePanel.repaint();
+				messagePanel.revalidate();
 			} else if(response.equals("MOVE_OK")) {
 				messageLabel.setText("Opponent's turn");
 				messagePanel.repaint();
@@ -134,11 +142,11 @@ public class Stratego extends JFrame {
 		setTitle("Stratego");
 		setBounds(100, 100, 768, 768);
 		
-		board = new Board();
 		messagePanel = new JPanel();
 		messageLabel = new JLabel("...");
 		messageLabel.setHorizontalAlignment(SwingConstants.CENTER);
 		messageLabel.setFont(new Font("Arial", Font.PLAIN, 16));
+		board = new Board(out, messageLabel);
 		
 		Container contentPane = getContentPane();
 		contentPane.add(messagePanel, BorderLayout.SOUTH);

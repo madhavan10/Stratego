@@ -3,32 +3,33 @@ package stratego;
 import java.awt.BorderLayout;
 import java.awt.Color;
 import java.awt.GridLayout;
-import java.awt.event.ActionEvent;
-import java.awt.event.ActionListener;
 import java.awt.event.MouseAdapter;
 import java.awt.event.MouseEvent;
 import java.awt.event.MouseMotionAdapter;
-
+import java.io.PrintWriter;
 import javax.swing.BorderFactory;
+import javax.swing.JLabel;
 import javax.swing.JPanel;
-import javax.swing.Timer;
+
 
 @SuppressWarnings("serial")
-public class Board extends JPanel implements ActionListener {
+public class Board extends JPanel {
 	
 	private final Square[][] board = new Square[BOARD_DIM][BOARD_DIM];
 	private final Piece[] whitePieces = new Piece[NO_OF_PIECES];
 	private final Piece[] blackPieces = new Piece[NO_OF_PIECES];
+	private final PrintWriter output;
+	private JLabel messageLabel;
 	
-	private int SETUP_TIME;
 	private boolean isSetupTime;
-	
 	private boolean playerTeam;
 	
 	private Square selected;
 	private Square target;
 	
-	public Board() {
+	public Board(PrintWriter writer, JLabel label) {
+		output = writer;
+		messageLabel = label;
 		setLayout(new GridLayout(BOARD_DIM, BOARD_DIM));
 		createSquares();
 		createPieces();
@@ -37,20 +38,12 @@ public class Board extends JPanel implements ActionListener {
 		selected = null;
 	}
 	
+	public boolean getPlayerTeam() {
+		return playerTeam;
+	}
+	
 	public Square[][] getBoard() {
 		return board;
-	}
-	
-	public void setSetupTime(int setupTime) {
-		SETUP_TIME = setupTime;
-		Timer timer = new Timer(SETUP_TIME, this);
-		timer.setRepeats(false);
-		timer.start();
-	}
-	
-	public void actionPerformed(ActionEvent timerEvent) {
-		isSetupTime = false;
-		System.out.println("Setup time over.");
 	}
 	
 	public void setTeam(boolean team) {
@@ -100,6 +93,7 @@ public class Board extends JPanel implements ActionListener {
 				else {
 					board[i][j] = new Square(i, j, !forbidden);
 					square = board[i][j];
+					square.setBackground(Color.darkGray);
 					square.setBorder(BorderFactory.createLineBorder(Color.black));
 				}
 				square.addMouseMotionListener(new SquareMotionListener());
@@ -237,6 +231,9 @@ public class Board extends JPanel implements ActionListener {
 	}
 	
 	private boolean isValidMove(Square square1, Square square2) {
+		int level1 = square1.getOccupant().getLevel();
+		if(level1 == Piece.FLAG || level1 == Piece.STRONGHOLD)
+			return false;
 		if(square2.y == square1.y)
 			if(Math.abs(square2.x - square1.x) == 1)
 				return true;
@@ -244,7 +241,7 @@ public class Board extends JPanel implements ActionListener {
 			if(Math.abs(square2.y - square1.y) == 1)
 				return true;
 		//scout
-		if(square1.getOccupant().getLevel() == 2 && (square2.x == square1.x || square2.y == square1.y))
+		if(level1 == 2 && (square2.x == square1.x || square2.y == square1.y))
 			return true;
 		return false;
 	}
@@ -259,12 +256,86 @@ public class Board extends JPanel implements ActionListener {
 			square1.setOccupant(null);
 			square1.setOccupied(false);
 		}
+		else {
+			//clash
+			if(square1.getOccupant().clash(square2.getOccupant()) > 0) {
+				messageLabel.setText("You captured " + square2.getOccupant());
+				square2.remove(square2.getOccupant());
+				square2.setOccupant(square1.getOccupant());
+				square2.add(square1.getOccupant());
+				
+				square1.remove(square1.getOccupant());
+				square1.setOccupant(null);
+				square1.setOccupied(false);
+				
+			}
+			else if(square1.getOccupant().clash(square2.getOccupant()) < 0) {
+				square1.remove(square1.getOccupant());
+				square1.setOccupant(null);
+				square1.setOccupied(false);
+				square2.getOccupant().setVisible(true);
+			}
+			else {
+				messageLabel.setText("Tie with " + square2.getOccupant());
+				square1.remove(square1.getOccupant());
+				square1.setOccupant(null);
+				square1.setOccupied(false);
+				square2.remove(square2.getOccupant());
+				square2.setOccupant(null);
+				square2.setOccupied(false);
+			}
+		}
+		selected = target = null;
+		repaint();
+		revalidate();
+		output.println("MOVE " + square1.x + "" + square1.y + "" + square2.x + "" + square2.y);
 	}
 	
 	public void moveOpponentPiece(int x1, int y1, int x2, int y2) {
-		//TODO
 		Square square1 = board[x1][y1];
 		Square square2 = board[x2][y2];
+		if(!square2.isOccupied()) {
+			square2.setOccupant(square1.getOccupant());
+			square2.setOccupied(true);
+			square2.add(square1.getOccupant());
+			square2.getOccupant().setVisible(true);
+			
+			square1.remove(square1.getOccupant());
+			square1.setOccupant(null);
+			square1.setOccupied(false);
+		}
+		else {
+			//clash
+			if(square1.getOccupant().clash(square2.getOccupant()) > 0) {
+				messageLabel.setText("You lost " + square2.getOccupant());
+				square2.remove(square2.getOccupant());
+				square2.setOccupant(square1.getOccupant());
+				square2.add(square1.getOccupant());
+				square2.getOccupant().setVisible(true);
+				
+				square1.remove(square1.getOccupant());
+				square1.setOccupant(null);
+				square1.setOccupied(false);
+				
+			}
+			else if(square1.getOccupant().clash(square2.getOccupant()) < 0) {
+				messageLabel.setText("Opponent lost " + square1.getOccupant());
+				square1.remove(square1.getOccupant());
+				square1.setOccupant(null);
+				square1.setOccupied(false);
+			}
+			else {
+				messageLabel.setText("Tie with " + square1.getOccupant());
+				square1.remove(square1.getOccupant());
+				square1.setOccupant(null);
+				square1.setOccupied(false);
+				square2.remove(square2.getOccupant());
+				square2.setOccupant(null);
+				square2.setOccupied(false);
+			}
+		}
+		repaint();
+		revalidate();
 	}
 	
 	private class SquareMotionListener extends MouseMotionAdapter {
@@ -336,5 +407,7 @@ public class Board extends JPanel implements ActionListener {
 	public static final int BOARD_DIM = 10;
 	public static final boolean ORC = false;
 	public static final boolean HUMAN = true;
+
+
 	
 } //end class
