@@ -1,3 +1,4 @@
+/*
 package stratego;
 
 import java.awt.BorderLayout;
@@ -26,6 +27,7 @@ public class Board extends JPanel {
 	
 	private Square selected;
 	private Square target;
+	private boolean isMyTurn;
 	
 	public Board(PrintWriter writer, JLabel label) {
 		output = writer;
@@ -411,9 +413,12 @@ public class Board extends JPanel {
 				selected = target = null;
 			}
 			else {
+				if(!isMyTurn) 
+					return;
 				if(isValidMove(selected, target)) {
 					movePiece(selected, target);
 					selected = target = null;
+					isMyTurn = false;
 				}
 			}
 		}
@@ -425,6 +430,11 @@ public class Board extends JPanel {
 	public static final boolean ORC = false;
 	public static final boolean HUMAN = true;
 
+	public void setIsMyTurn(boolean b) {
+		isMyTurn = b;
+	}
+
 
 	
 } //end class
+*/

@@ -38,7 +38,6 @@ public class Square extends JPanel {
 	
 	public void setOccupant(Piece occupant) {
 		this.occupant = occupant;
-		isOccupied = true;
 	}
 	
 	public String toString() {

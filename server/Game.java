@@ -61,9 +61,13 @@ public class Game {
 		}
 
 		private void processCommands() {
+			System.out.println("Process commands");
 			while(input.hasNextLine()) {
+				System.out.println("Process commands loop head");
 				String command = input.nextLine();
+				System.out.println(command);
 				if(command.startsWith("MOVE")) {
+					System.out.println(command);
 					String command2 = command.substring(5, 9);
 					int x1 = Integer.parseInt(command2.substring(0, 1));
 					int y1 = Integer.parseInt(command2.substring(1, 2));
