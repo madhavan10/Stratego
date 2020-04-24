@@ -7,9 +7,11 @@ import java.awt.EventQueue;
 import javax.swing.JButton;
 import javax.swing.JFrame;
 import javax.swing.JLabel;
+import javax.swing.JOptionPane;
 import javax.swing.JPanel;
 import java.awt.Font;
 import java.awt.event.MouseAdapter;
+import java.awt.event.MouseEvent;
 import java.io.IOException;
 import java.io.PrintWriter;
 import java.net.Socket;
@@ -44,26 +46,67 @@ public class Stratego extends JFrame {
 	}
 	
 	protected void play() {
+		
 		while(in.hasNextLine() ) {
 			String response = in.nextLine();
 			if(response.equals("CHOOSE_TEAM")) {
 				messageLabel.setText("Choose Team:");
-				JButton orc = new JButton("ORC");
+				final JButton orc = new JButton("ORC");
+				final JButton human = new JButton("HUMAN");
 				orc.addMouseListener(new MouseAdapter() {
-					public void mouseClicked() {
+					public void mouseClicked(MouseEvent e) {
 						out.println("PICK_TEAM orc");
+						messagePanel.remove(orc);
+						messagePanel.remove(human);
+						messageLabel.setText("...");
+						messagePanel.repaint();
+						messagePanel.revalidate();
 					}
 				});
-				JButton human = new JButton("HUMAN");
 				human.addMouseListener(new MouseAdapter() {
-					public void mouseClicked() {
+					public void mouseClicked(MouseEvent e) {
 						out.println("PICK_TEAM human");
+						messagePanel.remove(human);
+						messagePanel.remove(orc);
+						messageLabel.setText("...");
+						messagePanel.repaint();
+						messagePanel.revalidate();
 					}
 				});
-				messageLabel.add(orc);
-				messageLabel.add(human);
+				messagePanel.add(orc);
+				messagePanel.add(human);
+				messagePanel.repaint();
+				messagePanel.revalidate();
+			} else if(response.startsWith("YOUR_TEAM")) {
+				boolean team = Boolean.parseBoolean(response.substring(10));
+				board.setTeam(team);
+				String teamAsStr = team ? "HUMAN" : "ORC";
+				setTitle("Stratego " + teamAsStr);
+			} else if(response.startsWith("SETUP")) {
+				int setupTime = Integer.parseInt(response.substring(6));
+				board.setSetupTime(setupTime);
+			} else if(response.equals("SETUP_TIME_OVER")) {
+				board.setupTimeOver();
+			} else if(response.equals("MOVE_OK")) {
+				messageLabel.setText("Opponent's turn");
+				messagePanel.repaint();
+				messagePanel.revalidate();
+			} else if(response.startsWith("OTHER_PLAYER_MOVED")) {
+				String moveStr = response.substring(18, 22);
+				int x1 = Integer.parseInt(moveStr.substring(18, 19));
+				int y1 = Integer.parseInt(moveStr.substring(19, 20));
+				int x2 = Integer.parseInt(moveStr.substring(20, 21));
+				int y2 = Integer.parseInt(moveStr.substring(21, 22));
+				board.moveOpponentPiece(x1, y1, x2, y2);
+				messageLabel.setText("Your turn");
+				messagePanel.repaint();
+				messagePanel.revalidate();
+			} else if(response.equals("OTHER_PLAYER_LEFT")) {
+				JOptionPane.showMessageDialog(this, "Other player left");
+				break;
 			}
 		}
+		
 		
 	}
 
@@ -71,6 +114,7 @@ public class Stratego extends JFrame {
 	private Scanner in;
 	private PrintWriter out;
 	
+	private JPanel messagePanel;
 	private JLabel messageLabel;
 	private Board board;
 	
@@ -91,13 +135,15 @@ public class Stratego extends JFrame {
 		setBounds(100, 100, 768, 768);
 		
 		board = new Board();
+		messagePanel = new JPanel();
 		messageLabel = new JLabel("...");
 		messageLabel.setHorizontalAlignment(SwingConstants.CENTER);
 		messageLabel.setFont(new Font("Arial", Font.PLAIN, 16));
 		
 		Container contentPane = getContentPane();
-		contentPane.add(messageLabel, BorderLayout.SOUTH);
-		contentPane.add(board, BorderLayout.CENTER);	
+		contentPane.add(messagePanel, BorderLayout.SOUTH);
+		contentPane.add(board, BorderLayout.CENTER);
+		messagePanel.add(messageLabel);
 	}
 
 }

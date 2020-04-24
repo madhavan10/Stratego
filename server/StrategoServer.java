@@ -11,7 +11,8 @@ import java.util.concurrent.Executors;
  * 
  * Server -> Client:
  * CHOOSE_TEAM
- * SETUP <minutes> <team as boolean>
+ * SETUP <minutes>
+ * YOUR_TEAM <team as boolean>
  * SETUP_TIME_OVER
  * MOVE_OK
  * OTHER_PLAYER_MOVED <x1><y1><x2><y2>

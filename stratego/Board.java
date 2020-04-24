@@ -20,7 +20,10 @@ public class Board extends JPanel implements ActionListener {
 	private final Piece[] whitePieces = new Piece[NO_OF_PIECES];
 	private final Piece[] blackPieces = new Piece[NO_OF_PIECES];
 	
+	private int SETUP_TIME;
 	private boolean isSetupTime;
+	
+	private boolean playerTeam;
 	
 	private Square selected;
 	private Square target;
@@ -32,10 +35,41 @@ public class Board extends JPanel implements ActionListener {
 		setPieces();
 		isSetupTime = true;
 		selected = null;
-		
+	}
+	
+	public Square[][] getBoard() {
+		return board;
+	}
+	
+	public void setSetupTime(int setupTime) {
+		SETUP_TIME = setupTime;
 		Timer timer = new Timer(SETUP_TIME, this);
 		timer.setRepeats(false);
 		timer.start();
+	}
+	
+	public void actionPerformed(ActionEvent timerEvent) {
+		isSetupTime = false;
+		System.out.println("Setup time over.");
+	}
+	
+	public void setTeam(boolean team) {
+		playerTeam = team;
+		
+		for (Piece piece : whitePieces)
+			if(piece.getTeam() != playerTeam) 
+				piece.setVisible(false);
+		
+		for (Piece piece : blackPieces) 
+			if(piece.getTeam() != playerTeam)
+				piece.setVisible(false);
+		
+		repaint();
+		revalidate();
+	}
+	
+	public void setupTimeOver() {
+		isSetupTime = false;
 	}
 	
 	public String toString() {
@@ -77,88 +111,88 @@ public class Board extends JPanel implements ActionListener {
 	
 	private void createPieces() {
 		int i = 0;
-		whitePieces[i] = new Piece(10, "Gandalf", Player.HUMAN); i++;
-		whitePieces[i] = new Piece(9, "Aragorn", Player.HUMAN); i++;
-		whitePieces[i] = new Piece(8, "Legolas", Player.HUMAN); i++;
-		whitePieces[i] = new Piece(8, "Gimli", Player.HUMAN); i++;
-		whitePieces[i] = new Piece(7, "Faramir", Player.HUMAN); i++;		
-		whitePieces[i] = new Piece(7, "Theoden", Player.HUMAN); i++;		
-		whitePieces[i] = new Piece(7, "Eomer", Player.HUMAN); i++;
-		whitePieces[i] = new Piece(6, "Haldir", Player.HUMAN); i++;		
-		whitePieces[i] = new Piece(6, "Arwen", Player.HUMAN); i++;		
-		whitePieces[i] = new Piece(6, "Treebeard", Player.HUMAN); i++;		
-		whitePieces[i] = new Piece(6, "Boromir", Player.HUMAN); i++;		
-		whitePieces[i] = new Piece(5, "Elf-1", Player.HUMAN); i++;		
-		whitePieces[i] = new Piece(5, "Elf-2", Player.HUMAN); i++;		
-		whitePieces[i] = new Piece(5, "Elf-3", Player.HUMAN); i++;		
-		whitePieces[i] = new Piece(5, "Elf-4", Player.HUMAN); i++;		
-		whitePieces[i] = new Piece(4, "Merry", Player.HUMAN); i++;		
-		whitePieces[i] = new Piece(4, "Pippin", Player.HUMAN); i++;		
-		whitePieces[i] = new Piece(4, "Frodo", Player.HUMAN); i++;		
-		whitePieces[i] = new Piece(4, "Sam", Player.HUMAN); i++;
-		whitePieces[i] = new Piece(3, "Soldier-1", Player.HUMAN); i++;		
-		whitePieces[i] = new Piece(3, "Soldier-2", Player.HUMAN); i++;		
-		whitePieces[i] = new Piece(3, "Soldier-3", Player.HUMAN); i++;		
-		whitePieces[i] = new Piece(3, "Soldier-4", Player.HUMAN); i++;		
-		whitePieces[i] = new Piece(3, "Soldier-5", Player.HUMAN); i++;		
-		whitePieces[i] = new Piece(2, "Rider-1", Player.HUMAN); i++;		
-		whitePieces[i] = new Piece(2, "Rider-2", Player.HUMAN); i++;		
-		whitePieces[i] = new Piece(2, "Rider-3", Player.HUMAN); i++;		
-		whitePieces[i] = new Piece(2, "Rider-4", Player.HUMAN); i++;		
-		whitePieces[i] = new Piece(2, "Rider-5", Player.HUMAN); i++;		
-		whitePieces[i] = new Piece(2, "Rider-6", Player.HUMAN); i++;		
-		whitePieces[i] = new Piece(2, "Rider-7", Player.HUMAN); i++;		
-		whitePieces[i] = new Piece(2, "Rider-8", Player.HUMAN); i++;		
-		whitePieces[i] = new Piece(Piece.SPY, "Eowyn", Player.HUMAN); i++;		
-		whitePieces[i] = new Piece(Piece.STRONGHOLD, "Stronghold-1", Player.HUMAN); i++;		
-		whitePieces[i] = new Piece(Piece.STRONGHOLD, "Stronghold-2", Player.HUMAN); i++;		
-		whitePieces[i] = new Piece(Piece.STRONGHOLD, "Stronghold-3", Player.HUMAN); i++;		
-		whitePieces[i] = new Piece(Piece.STRONGHOLD, "Stronghold-4", Player.HUMAN); i++;		
-		whitePieces[i] = new Piece(Piece.STRONGHOLD, "Stronghold-5", Player.HUMAN); i++;		
-		whitePieces[i] = new Piece(Piece.STRONGHOLD, "Stronghold-6", Player.HUMAN); i++;
-		whitePieces[i] = new Piece(Piece.FLAG, "Flag", Player.HUMAN); i++;
+		whitePieces[i] = new Piece(10, "Gandalf", HUMAN); i++;
+		whitePieces[i] = new Piece(9, "Aragorn", HUMAN); i++;
+		whitePieces[i] = new Piece(8, "Legolas", HUMAN); i++;
+		whitePieces[i] = new Piece(8, "Gimli", HUMAN); i++;
+		whitePieces[i] = new Piece(7, "Faramir", HUMAN); i++;		
+		whitePieces[i] = new Piece(7, "Theoden", HUMAN); i++;		
+		whitePieces[i] = new Piece(7, "Eomer", HUMAN); i++;
+		whitePieces[i] = new Piece(6, "Haldir", HUMAN); i++;		
+		whitePieces[i] = new Piece(6, "Arwen", HUMAN); i++;		
+		whitePieces[i] = new Piece(6, "Treebeard", HUMAN); i++;		
+		whitePieces[i] = new Piece(6, "Boromir", HUMAN); i++;		
+		whitePieces[i] = new Piece(5, "Elf-1", HUMAN); i++;		
+		whitePieces[i] = new Piece(5, "Elf-2", HUMAN); i++;		
+		whitePieces[i] = new Piece(5, "Elf-3", HUMAN); i++;		
+		whitePieces[i] = new Piece(5, "Elf-4", HUMAN); i++;		
+		whitePieces[i] = new Piece(4, "Merry", HUMAN); i++;		
+		whitePieces[i] = new Piece(4, "Pippin", HUMAN); i++;		
+		whitePieces[i] = new Piece(4, "Frodo", HUMAN); i++;		
+		whitePieces[i] = new Piece(4, "Sam", HUMAN); i++;
+		whitePieces[i] = new Piece(3, "Soldier-1", HUMAN); i++;		
+		whitePieces[i] = new Piece(3, "Soldier-2", HUMAN); i++;		
+		whitePieces[i] = new Piece(3, "Soldier-3", HUMAN); i++;		
+		whitePieces[i] = new Piece(3, "Soldier-4", HUMAN); i++;		
+		whitePieces[i] = new Piece(3, "Soldier-5", HUMAN); i++;		
+		whitePieces[i] = new Piece(2, "Rider-1", HUMAN); i++;		
+		whitePieces[i] = new Piece(2, "Rider-2", HUMAN); i++;		
+		whitePieces[i] = new Piece(2, "Rider-3", HUMAN); i++;		
+		whitePieces[i] = new Piece(2, "Rider-4", HUMAN); i++;		
+		whitePieces[i] = new Piece(2, "Rider-5", HUMAN); i++;		
+		whitePieces[i] = new Piece(2, "Rider-6", HUMAN); i++;		
+		whitePieces[i] = new Piece(2, "Rider-7", HUMAN); i++;		
+		whitePieces[i] = new Piece(2, "Rider-8", HUMAN); i++;		
+		whitePieces[i] = new Piece(Piece.SPY, "Eowyn", HUMAN); i++;		
+		whitePieces[i] = new Piece(Piece.STRONGHOLD, "Stronghold-1", HUMAN); i++;		
+		whitePieces[i] = new Piece(Piece.STRONGHOLD, "Stronghold-2", HUMAN); i++;		
+		whitePieces[i] = new Piece(Piece.STRONGHOLD, "Stronghold-3", HUMAN); i++;		
+		whitePieces[i] = new Piece(Piece.STRONGHOLD, "Stronghold-4", HUMAN); i++;		
+		whitePieces[i] = new Piece(Piece.STRONGHOLD, "Stronghold-5", HUMAN); i++;		
+		whitePieces[i] = new Piece(Piece.STRONGHOLD, "Stronghold-6", HUMAN); i++;
+		whitePieces[i] = new Piece(Piece.FLAG, "Flag", HUMAN); i++;
 		
 		int j = 0;
-		blackPieces[j] = new Piece(10, "Witch King", Player.ORC); j++;
-		blackPieces[j] = new Piece(9, "Saruman", Player.ORC); j++;
-		blackPieces[j] = new Piece(8, "Ringwraith-1", Player.ORC); j++;
-		blackPieces[j] = new Piece(8, "Ringwraith-2", Player.ORC); j++;
-		blackPieces[j] = new Piece(7, "Gothmog", Player.ORC); j++;		
-		blackPieces[j] = new Piece(7, "Sharku", Player.ORC); j++;
-		blackPieces[j] = new Piece(7, "Lurtz", Player.ORC); j++;
-		blackPieces[j] = new Piece(6, "Uruk-1", Player.ORC); j++;
-		blackPieces[j] = new Piece(6, "Uruk-2", Player.ORC); j++;
-		blackPieces[j] = new Piece(6, "Uruk-3", Player.ORC); j++;
-		blackPieces[j] = new Piece(6, "Uruk-4", Player.ORC); j++;
-		blackPieces[j] = new Piece(5, "Beserker-1", Player.ORC); j++;
-		blackPieces[j] = new Piece(5, "Beserker-2", Player.ORC); j++;
-		blackPieces[j] = new Piece(5, "Beserker-3", Player.ORC); j++;
-		blackPieces[j] = new Piece(5, "Beserker-4", Player.ORC); j++;
-		blackPieces[j] = new Piece(4, "Haradrim-1", Player.ORC); j++;
-		blackPieces[j] = new Piece(4, "Haradrim-2", Player.ORC); j++;
-		blackPieces[j] = new Piece(4, "Haradrim-3", Player.ORC); j++;
-		blackPieces[j] = new Piece(4, "Haradrim-4", Player.ORC); j++;
-		blackPieces[j] = new Piece(3, "Orc-1", Player.ORC); j++;
-		blackPieces[j] = new Piece(3, "Orc-2", Player.ORC); j++;
-		blackPieces[j] = new Piece(3, "Orc-3", Player.ORC); j++;
-		blackPieces[j] = new Piece(3, "Orc-4", Player.ORC); j++;
-		blackPieces[j] = new Piece(3, "Orc-5", Player.ORC); j++;
-		blackPieces[j] = new Piece(2, "Warg-1", Player.ORC); j++;
-		blackPieces[j] = new Piece(2, "Warg-2", Player.ORC); j++;
-		blackPieces[j] = new Piece(2, "Warg-3", Player.ORC); j++;
-		blackPieces[j] = new Piece(2, "Warg-4", Player.ORC); j++;
-		blackPieces[j] = new Piece(2, "Warg-5", Player.ORC); j++;
-		blackPieces[j] = new Piece(2, "Warg-6", Player.ORC); j++;
-		blackPieces[j] = new Piece(2, "Warg-7", Player.ORC); j++;
-		blackPieces[j] = new Piece(2, "Warg-8", Player.ORC); j++;
-		blackPieces[j] = new Piece(Piece.SPY, "Grima", Player.ORC); j++;
-		blackPieces[j] = new Piece(Piece.STRONGHOLD, "Stronghold-1", Player.ORC); j++;
-		blackPieces[j] = new Piece(Piece.STRONGHOLD, "Stronghold-2", Player.ORC); j++;
-		blackPieces[j] = new Piece(Piece.STRONGHOLD, "Stronghold-3", Player.ORC); j++;
-		blackPieces[j] = new Piece(Piece.STRONGHOLD, "Stronghold-4", Player.ORC); j++;
-		blackPieces[j] = new Piece(Piece.STRONGHOLD, "Stronghold-5", Player.ORC); j++;
-		blackPieces[j] = new Piece(Piece.STRONGHOLD, "Stronghold-6", Player.ORC); j++;
-		blackPieces[j] = new Piece(Piece.FLAG, "Flag", Player.ORC); j++;
+		blackPieces[j] = new Piece(10, "Witch King", ORC); j++;
+		blackPieces[j] = new Piece(9, "Saruman", ORC); j++;
+		blackPieces[j] = new Piece(8, "Ringwraith-1", ORC); j++;
+		blackPieces[j] = new Piece(8, "Ringwraith-2", ORC); j++;
+		blackPieces[j] = new Piece(7, "Gothmog", ORC); j++;		
+		blackPieces[j] = new Piece(7, "Sharku", ORC); j++;
+		blackPieces[j] = new Piece(7, "Lurtz", ORC); j++;
+		blackPieces[j] = new Piece(6, "Uruk-1", ORC); j++;
+		blackPieces[j] = new Piece(6, "Uruk-2", ORC); j++;
+		blackPieces[j] = new Piece(6, "Uruk-3", ORC); j++;
+		blackPieces[j] = new Piece(6, "Uruk-4", ORC); j++;
+		blackPieces[j] = new Piece(5, "Beserker-1", ORC); j++;
+		blackPieces[j] = new Piece(5, "Beserker-2", ORC); j++;
+		blackPieces[j] = new Piece(5, "Beserker-3", ORC); j++;
+		blackPieces[j] = new Piece(5, "Beserker-4", ORC); j++;
+		blackPieces[j] = new Piece(4, "Haradrim-1", ORC); j++;
+		blackPieces[j] = new Piece(4, "Haradrim-2", ORC); j++;
+		blackPieces[j] = new Piece(4, "Haradrim-3", ORC); j++;
+		blackPieces[j] = new Piece(4, "Haradrim-4", ORC); j++;
+		blackPieces[j] = new Piece(3, "Orc-1", ORC); j++;
+		blackPieces[j] = new Piece(3, "Orc-2", ORC); j++;
+		blackPieces[j] = new Piece(3, "Orc-3", ORC); j++;
+		blackPieces[j] = new Piece(3, "Orc-4", ORC); j++;
+		blackPieces[j] = new Piece(3, "Orc-5", ORC); j++;
+		blackPieces[j] = new Piece(2, "Warg-1", ORC); j++;
+		blackPieces[j] = new Piece(2, "Warg-2", ORC); j++;
+		blackPieces[j] = new Piece(2, "Warg-3", ORC); j++;
+		blackPieces[j] = new Piece(2, "Warg-4", ORC); j++;
+		blackPieces[j] = new Piece(2, "Warg-5", ORC); j++;
+		blackPieces[j] = new Piece(2, "Warg-6", ORC); j++;
+		blackPieces[j] = new Piece(2, "Warg-7", ORC); j++;
+		blackPieces[j] = new Piece(2, "Warg-8", ORC); j++;
+		blackPieces[j] = new Piece(Piece.SPY, "Grima", ORC); j++;
+		blackPieces[j] = new Piece(Piece.STRONGHOLD, "Stronghold-1", ORC); j++;
+		blackPieces[j] = new Piece(Piece.STRONGHOLD, "Stronghold-2", ORC); j++;
+		blackPieces[j] = new Piece(Piece.STRONGHOLD, "Stronghold-3", ORC); j++;
+		blackPieces[j] = new Piece(Piece.STRONGHOLD, "Stronghold-4", ORC); j++;
+		blackPieces[j] = new Piece(Piece.STRONGHOLD, "Stronghold-5", ORC); j++;
+		blackPieces[j] = new Piece(Piece.STRONGHOLD, "Stronghold-6", ORC); j++;
+		blackPieces[j] = new Piece(Piece.FLAG, "Flag", ORC); j++;
 	}
 	
 	private void setPieces() {
@@ -197,8 +231,7 @@ public class Board extends JPanel implements ActionListener {
 		square2.remove(square2.getOccupant());
 		square2.setOccupant(tmp);
 		square2.add(tmp);
-		selected = null;
-		target = null;
+		selected = target = null;
 		repaint();
 		revalidate();
 	}
@@ -210,12 +243,28 @@ public class Board extends JPanel implements ActionListener {
 		if(square2.x == square1.x)
 			if(Math.abs(square2.y - square1.y) == 1)
 				return true;
-		//TODO warg
+		//scout
+		if(square1.getOccupant().getLevel() == 2 && (square2.x == square1.x || square2.y == square1.y))
+			return true;
 		return false;
 	}
 	
 	private void movePiece(Square square1, Square square2) {
-		
+		if(!square2.isOccupied()) {	
+			square2.setOccupant(square1.getOccupant());
+			square2.setOccupied(true);
+			square2.add(square1.getOccupant());
+			
+			square1.remove(square1.getOccupant());
+			square1.setOccupant(null);
+			square1.setOccupied(false);
+		}
+	}
+	
+	public void moveOpponentPiece(int x1, int y1, int x2, int y2) {
+		//TODO
+		Square square1 = board[x1][y1];
+		Square square2 = board[x2][y2];
 	}
 	
 	private class SquareMotionListener extends MouseMotionAdapter {
@@ -282,14 +331,10 @@ public class Board extends JPanel implements ActionListener {
 		}
 		
 	}
-
-	public void actionPerformed(ActionEvent arg0) {
-		isSetupTime = false;
-		System.out.println("Setup time over.");
-	}
 	
 	public static final int NO_OF_PIECES = 40;
 	public static final int BOARD_DIM = 10;
-	public static final int SETUP_TIME = 1000 * 60 * 10;
+	public static final boolean ORC = false;
+	public static final boolean HUMAN = true;
 	
 } //end class

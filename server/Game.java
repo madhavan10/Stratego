@@ -103,8 +103,10 @@ public class Game {
 				player2 = this;
 				opponent = player1;
 				opponent.opponent = this;
-				output.println("SETUP " + SETUP_TIME_IN_MINUTES + " " + team);
-				opponent.output.println("SETUP " + SETUP_TIME_IN_MINUTES + " " + opponent.team);
+				output.println("YOUR_TEAM " + team);
+				opponent.output.println("YOUR_TEAM " + opponent.team);
+				output.println("SETUP " + SETUP_TIME_IN_MINUTES);
+				opponent.output.println("SETUP " + SETUP_TIME_IN_MINUTES);
 				Timer timer = new Timer(SETUP_TIME_IN_MINUTES * 1000 * 60, this);
 				timer.setRepeats(false);
 				timer.start();

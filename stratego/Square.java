@@ -24,6 +24,10 @@ public class Square extends JPanel {
 		return isOccupied;
 	}
 	
+	public void setOccupied(boolean occupied) {
+		isOccupied = occupied;
+	}
+	
 	public Piece getOccupant() {
 		return occupant;
 	}
