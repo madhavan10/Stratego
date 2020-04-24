@@ -16,10 +16,6 @@ import javax.swing.Timer;
 @SuppressWarnings("serial")
 public class Board extends JPanel implements ActionListener {
 	
-	public static final int NO_OF_PIECES = 40;
-	public static final int BOARD_DIM = 10;
-	public static final int SETUP_TIME = 1000 * 60 * 10;
-	
 	private final Square[][] board = new Square[BOARD_DIM][BOARD_DIM];
 	private final Piece[] whitePieces = new Piece[NO_OF_PIECES];
 	private final Piece[] blackPieces = new Piece[NO_OF_PIECES];
@@ -273,16 +269,16 @@ public class Board extends JPanel implements ActionListener {
 				selected = null;
 				return;
 			}
-				if(isSetupTime) {
-					swapPieces(selected, target);
+			if(isSetupTime) {
+				swapPieces(selected, target);
+				selected = target = null;
+			}
+			else {
+				if(isValidMove(selected, target)) {
+					movePiece(selected, target);
 					selected = target = null;
 				}
-				else {
-					if(isValidMove(selected, target)) {
-						movePiece(selected, target);
-						selected = target = null;
-					}
-				}
+			}
 		}
 		
 	}
@@ -291,5 +287,9 @@ public class Board extends JPanel implements ActionListener {
 		isSetupTime = false;
 		System.out.println("Setup time over.");
 	}
+	
+	public static final int NO_OF_PIECES = 40;
+	public static final int BOARD_DIM = 10;
+	public static final int SETUP_TIME = 1000 * 60 * 10;
 	
 } //end class
