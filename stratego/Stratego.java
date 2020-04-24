@@ -26,25 +26,30 @@ public class Stratego extends JFrame {
 	/**
 	 * Launch the application.
 	 * @throws IOException 
+	 * @throws InterruptedException 
 	 */
-	public static void main(String[] args) throws IOException {
+	public static void main(String[] args) throws IOException, InterruptedException {
 		if(args.length != 1) {
 			System.err.println("Pass the IP of the Server as the sole command-line argument");
 			return;
 		}
 		final String serverIP = args[0];
 		final Stratego frame = new Stratego(serverIP);
+		frame.initUI();
+		frame.setVisible(true);
+		frame.play();
+		/*
 		EventQueue.invokeLater(new Runnable() {
 			public void run() {
 				try {
 					frame.initUI();
 					frame.setVisible(true);
-					frame.play();
 				} catch (Exception e) {
 					e.printStackTrace();
 				}
 			}
 		});
+		*/
 	}
 	
 	protected void play() {
@@ -54,7 +59,7 @@ public class Stratego extends JFrame {
 			String response = in.nextLine();
 			if(response.equals("CHOOSE_TEAM")) {
 				
-				System.out.println("Choose team");
+				//System.out.println("Choose team");
 				
 				messageLabel.setText("Choose Team:");
 				final JButton orc = new JButton("ORC");
@@ -84,7 +89,7 @@ public class Stratego extends JFrame {
 				messagePanel.repaint();
 				messagePanel.revalidate();
 				
-				System.out.println("end of choose team");
+				//System.out.println("end of choose team");
 			} else if(response.startsWith("MESSAGE")) {
 				
 				System.out.println(response);
@@ -111,9 +116,11 @@ public class Stratego extends JFrame {
 				messagePanel.repaint();
 				messagePanel.revalidate();
 			} else if(response.equals("MOVE_OK")) {
-				messageLabel.setText("Opponent's turn");
-				messagePanel.repaint();
-				messagePanel.revalidate();
+				if(!board.isSetupTime()) {
+					messageLabel.setText("Opponent's turn");
+					messagePanel.repaint();
+					messagePanel.revalidate();
+				}
 			} else if(response.startsWith("OTHER_PLAYER_MOVED")) {
 				String moveStr = response.substring(18, 22);
 				int x1 = Integer.parseInt(moveStr.substring(18, 19));
@@ -128,9 +135,9 @@ public class Stratego extends JFrame {
 				JOptionPane.showMessageDialog(this, "Other player left");
 				break;
 			}
-			System.out.println("end of loop body");
+			//System.out.println("end of loop body");
 		}
-		System.out.println("end of method body");
+		//System.out.println("end of method body");
 		
 	}
 

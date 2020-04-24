@@ -85,11 +85,11 @@ public class Game {
 			output = new PrintWriter(socket.getOutputStream(), true);
 			
 			if(!firstPlayerJoined) {
-				System.out.println("Choose team");
+				//System.out.println("Choose team");
 				output.println("CHOOSE_TEAM");
 				team = getTeamSelectionFromClient();
 				player1 = this;
-				System.out.println("Waiting for other player");
+				//System.out.println("Waiting for other player");
 				output.println("MESSAGE Waiting for other player to connect");
 				firstPlayerJoined = true;
 			} else {
@@ -113,7 +113,7 @@ public class Game {
 			while(input.hasNextLine()) {
 				String command = input.nextLine();
 				if(command.startsWith("PICK_TEAM")) {
-					System.out.println(command);
+					//System.out.println(command);
 					return command.substring(10).equalsIgnoreCase("orc") ? ORC : HUMAN;
 				} 
 			}

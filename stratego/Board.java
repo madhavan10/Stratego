@@ -38,6 +38,10 @@ public class Board extends JPanel {
 		selected = null;
 	}
 	
+	public boolean isSetupTime() {
+		return isSetupTime;
+	}
+	
 	public boolean getPlayerTeam() {
 		return playerTeam;
 	}
