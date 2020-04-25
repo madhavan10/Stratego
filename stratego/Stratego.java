@@ -48,28 +48,14 @@ public class Stratego extends JFrame {
 		frame.initUI();
 		frame.setVisible(true);
 		frame.play();
-		/*
-		EventQueue.invokeLater(new Runnable() {
-			public void run() {
-				try {
-					frame.initUI();
-					frame.setVisible(true);
-				} catch (Exception e) {
-					e.printStackTrace();
-				}
-			}
-		});
-		*/
 	}
 	
 	protected void play() {
 		
 		while(in.hasNextLine()) {
-			//System.out.println("head of loop");
 			String response = in.nextLine();
+                        System.out.println(response);
 			if(response.equals("CHOOSE_TEAM")) {
-				
-				//System.out.println("Choose team");
 				
 				messageLabel.setText("Choose Team:");
 				final JButton orc = new JButton("ORC");
@@ -102,7 +88,6 @@ public class Stratego extends JFrame {
 				//System.out.println("end of choose team");
 			} else if(response.startsWith("MESSAGE")) {
 				
-				System.out.println(response);
 				
 				messageLabel.setText(response);
 				messagePanel.repaint();
@@ -434,12 +419,22 @@ public class Stratego extends JFrame {
 			}
 			shadeOccupiedSquares();
 		}
+
+                private void refreshBorders() {
+                    for(int j = 0; j < BOARD_DIM; j++)
+                        for(int i = 0; i < BOARD_DIM; i++)
+                            board[i][j].setBorder(BorderFactory.createLineBorder(Color.black));
+                    repaint();
+                    revalidate();
+                }
 		
 		private void shadeOccupiedSquares() {
 			for(int j = 0; j <= 9; j++) {
 				for(int i = 0; i <= 9; i++) {
-					if(board[i][j].isOccupied())
-						board[i][j].setBackground(Color.darkGray);
+					if(board[i][j].isOccupied()) {
+                                                Color color = board[i][j].getOccupant().getTeam() ? Color.yellow : Color.darkGray;
+						board[i][j].setBackground(color);
+                                        }
 					else if(!board[i][j].isForbidden())
 						board[i][j].setBackground(Color.gray);
 					else
@@ -488,7 +483,7 @@ public class Stratego extends JFrame {
 				square2.setOccupant(square1.getOccupant());
 				square2.setOccupied(true);
 				square2.add(square1.getOccupant());
-				
+			        	
 				square1.remove(square1.getOccupant());
 				square1.setOccupant(null);
 				square1.setOccupied(false);
@@ -504,7 +499,7 @@ public class Stratego extends JFrame {
 					square2.remove(square2.getOccupant());
 					square2.setOccupant(square1.getOccupant());
 					square2.add(square1.getOccupant());
-					
+
 					square1.remove(square1.getOccupant());
 					square1.setOccupant(null);
 					square1.setOccupied(false);
@@ -538,6 +533,7 @@ public class Stratego extends JFrame {
 		public void moveOpponentPiece(int x1, int y1, int x2, int y2) {
 			Square square1 = board[x1][y1];
 			Square square2 = board[x2][y2];
+                        refreshBorders();
 			if(isSetupTime) {
 				//swap
 				Piece tmp = square1.getOccupant();
@@ -554,6 +550,7 @@ public class Stratego extends JFrame {
 				square2.setOccupant(square1.getOccupant());
 				square2.setOccupied(true);
 				square2.add(square1.getOccupant());
+                                square2.setBorder(BorderFactory.createLineBorder(Color.green));
 				
 				square1.remove(square1.getOccupant());
 				square1.setOccupant(null);
@@ -569,6 +566,7 @@ public class Stratego extends JFrame {
 					square2.setOccupant(square1.getOccupant());
 					square2.add(square1.getOccupant());
 					square2.getOccupant().setVisible(true);
+                                        square2.setBorder(BorderFactory.createLineBorder(Color.green));
 					
 					square1.remove(square1.getOccupant());
 					square1.setOccupant(null);
@@ -579,6 +577,7 @@ public class Stratego extends JFrame {
 					eventLabel.setText("Opponent lost " + square1.getOccupant());
 					eventLabel.repaint();
 					eventLabel.revalidate();
+                                        square2.setBorder(BorderFactory.createLineBorder(Color.green));
 					square1.remove(square1.getOccupant());
 					square1.setOccupant(null);
 					square1.setOccupied(false);

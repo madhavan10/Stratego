@@ -24,7 +24,7 @@ public class Piece extends JLabel {
 		isDead = false;
 		
 		setText(this.toString());
-		setForeground(team ? Color.WHITE : Color.BLACK);
+		setForeground(team ? Color.BLACK : Color.WHITE);
 		setFont(new Font("Arial", Font.BOLD, 12));
 	}
 	
