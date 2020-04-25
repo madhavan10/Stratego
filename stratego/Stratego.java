@@ -145,13 +145,18 @@ public class Stratego extends JFrame {
 				board.moveOpponentPiece(x1, y1, x2, y2);
 				if(!board.isSetupTime()) {
 					board.setIsMyTurn(true);
-					board.hideEnemyPieces();
 					messageLabel.setText("Your turn");
 					messagePanel.repaint();
 					messagePanel.revalidate();
 				}
 			} else if(response.equals("OTHER_PLAYER_LEFT")) {
 				JOptionPane.showMessageDialog(this, "Other player left");
+				break;
+			} else if(response.equals("VICTORY")) {
+				JOptionPane.showMessageDialog(this, "End");
+				break;
+			} else if(response.equals("DEFEAT")) {
+				JOptionPane.showMessageDialog(this, "End");
 				break;
 			}
 			//System.out.println("end of loop body");
@@ -166,6 +171,7 @@ public class Stratego extends JFrame {
 	
 	private JPanel messagePanel;
 	private JLabel messageLabel;
+	private JLabel eventLabel;
 	private Board board;
 	
 	/**
@@ -187,12 +193,17 @@ public class Stratego extends JFrame {
 		messageLabel = new JLabel("...");
 		messageLabel.setHorizontalAlignment(SwingConstants.CENTER);
 		messageLabel.setFont(new Font("Arial", Font.PLAIN, 16));
+		
+		eventLabel = new JLabel("...");
+		eventLabel.setFont(new Font("Arial", Font.PLAIN, 16));
+		eventLabel.setHorizontalAlignment(SwingConstants.RIGHT);
 		board = new Board();
 		
 		Container contentPane = getContentPane();
 		contentPane.add(messagePanel, BorderLayout.SOUTH);
 		contentPane.add(board, BorderLayout.CENTER);
-		messagePanel.add(messageLabel);
+		messagePanel.add(messageLabel, BorderLayout.NORTH);
+		messagePanel.add(eventLabel, BorderLayout.SOUTH);
 	}
 	
 	
@@ -471,6 +482,8 @@ public class Stratego extends JFrame {
 		}
 		
 		private void movePiece(Square square1, Square square2) {
+			hideEnemyPieces();
+			boolean flag = false;
 			if(!square2.isOccupied()) {	
 				square2.setOccupant(square1.getOccupant());
 				square2.setOccupied(true);
@@ -482,8 +495,12 @@ public class Stratego extends JFrame {
 			}
 			else {
 				//clash
+				if(square2.getOccupant().getLevel() == Piece.FLAG)
+					flag = true;
 				if(square1.getOccupant().clash(square2.getOccupant()) > 0) {
-					messageLabel.setText("You captured " + square2.getOccupant());
+					eventLabel.setText("You captured " + square2.getOccupant());
+					eventLabel.repaint();
+					eventLabel.revalidate();
 					square2.remove(square2.getOccupant());
 					square2.setOccupant(square1.getOccupant());
 					square2.add(square1.getOccupant());
@@ -500,7 +517,9 @@ public class Stratego extends JFrame {
 					square2.getOccupant().setVisible(true);
 				}
 				else {
-					messageLabel.setText("Tie with " + square2.getOccupant());
+					eventLabel.setText("Tie with " + square2.getOccupant());
+					eventLabel.repaint();
+					eventLabel.revalidate();
 					square1.remove(square1.getOccupant());
 					square1.setOccupant(null);
 					square1.setOccupied(false);
@@ -512,6 +531,8 @@ public class Stratego extends JFrame {
 			shadeOccupiedSquares();
 			selected = target = null;
 			out.println("MOVE " + square1.x + "" + square1.y + "" + square2.x + "" + square2.y);
+			if(flag)
+				out.println("FLAG");
 		}
 		
 		public void moveOpponentPiece(int x1, int y1, int x2, int y2) {
@@ -541,7 +562,9 @@ public class Stratego extends JFrame {
 			else {
 				//clash
 				if(square1.getOccupant().clash(square2.getOccupant()) > 0) {
-					messageLabel.setText("You lost " + square2.getOccupant());
+					eventLabel.setText("You lost " + square2.getOccupant());
+					eventLabel.repaint();
+					eventLabel.revalidate();
 					square2.remove(square2.getOccupant());
 					square2.setOccupant(square1.getOccupant());
 					square2.add(square1.getOccupant());
@@ -553,13 +576,17 @@ public class Stratego extends JFrame {
 					
 				}
 				else if(square1.getOccupant().clash(square2.getOccupant()) < 0) {
-					messageLabel.setText("Opponent lost " + square1.getOccupant());
+					eventLabel.setText("Opponent lost " + square1.getOccupant());
+					eventLabel.repaint();
+					eventLabel.revalidate();
 					square1.remove(square1.getOccupant());
 					square1.setOccupant(null);
 					square1.setOccupied(false);
 				}
 				else {
-					messageLabel.setText("Tie with " + square1.getOccupant());
+					eventLabel.setText("Tie with " + square1.getOccupant());
+					eventLabel.repaint();
+					eventLabel.revalidate();
 					square1.remove(square1.getOccupant());
 					square1.setOccupant(null);
 					square1.setOccupied(false);

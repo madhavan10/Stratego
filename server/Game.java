@@ -23,7 +23,9 @@ public class Game {
 	}
 	
 	public synchronized void move(int x1, int y1, int x2, int y2, Player player) {
-		if(player != currentPlayer && !isSetupTime) {
+		if(isSetupTime)
+			return;
+		if(player != currentPlayer) {
 			throw new IllegalStateException("MESSAGE Not your turn");
 		}
 		if(player.opponent == null) {
@@ -65,7 +67,6 @@ public class Game {
 			while(input.hasNextLine()) {
 				System.out.println("Process commands loop head");
 				String command = input.nextLine();
-				System.out.println(command);
 				if(command.startsWith("MOVE")) {
 					System.out.println(command);
 					String command2 = command.substring(5, 9);
@@ -80,6 +81,9 @@ public class Game {
 					} catch(IllegalStateException e) {
 						output.println(e.getMessage());
 					}
+				} else if(command.equals("FLAG")) {
+					output.println("VICTORY");
+					opponent.output.println("DEFEAT");
 				}
 			}
 		}
