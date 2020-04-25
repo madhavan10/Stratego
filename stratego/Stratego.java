@@ -221,7 +221,6 @@ public class Stratego extends JFrame {
 		
 		private Square selected;
 		private Square target;
-		private Square lastMove;
 		private boolean isMyTurn;
 		
 		public Board() {
@@ -483,7 +482,6 @@ public class Stratego extends JFrame {
 		}
 		
 		private void movePiece(Square square1, Square square2) {
-			lastMove.setBorder(BorderFactory.createLineBorder(Color.black));
 			hideEnemyPieces();
 			boolean flag = false;
 			if(!square2.isOccupied()) {	
@@ -556,8 +554,6 @@ public class Stratego extends JFrame {
 				square2.setOccupant(square1.getOccupant());
 				square2.setOccupied(true);
 				square2.add(square1.getOccupant());
-				lastMove = square2;
-				lastMove.setBorder(BorderFactory.createLineBorder(Color.green));
 				
 				square1.remove(square1.getOccupant());
 				square1.setOccupant(null);
@@ -573,8 +569,6 @@ public class Stratego extends JFrame {
 					square2.setOccupant(square1.getOccupant());
 					square2.add(square1.getOccupant());
 					square2.getOccupant().setVisible(true);
-					lastMove = square2;
-					lastMove.setBorder(BorderFactory.createLineBorder(Color.green));
 					
 					square1.remove(square1.getOccupant());
 					square1.setOccupant(null);
@@ -588,8 +582,6 @@ public class Stratego extends JFrame {
 					square1.remove(square1.getOccupant());
 					square1.setOccupant(null);
 					square1.setOccupied(false);
-					lastMove = square2;
-					lastMove.setBorder(BorderFactory.createLineBorder(Color.green));
 				}
 				else {
 					eventLabel.setText("Tie with " + square1.getOccupant());
