@@ -49,7 +49,13 @@ public class Piece extends JLabel {
 	}
 	
 	public String toString() {
-		return name;
+		if(level == STRONGHOLD)
+			return "Stronghold";
+		if(level == FLAG)
+			return "Flag";
+		if(level == SPY)
+			return "Spy";
+		return "" + level;
 	}
 
 	/**

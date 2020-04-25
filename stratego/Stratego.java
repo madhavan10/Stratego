@@ -203,7 +203,7 @@ public class Stratego extends JFrame {
 		contentPane.add(messagePanel, BorderLayout.SOUTH);
 		contentPane.add(board, BorderLayout.CENTER);
 		messagePanel.add(messageLabel, BorderLayout.NORTH);
-		messagePanel.add(eventLabel, BorderLayout.SOUTH);
+		messagePanel.add(eventLabel, BorderLayout.CENTER);
 	}
 	
 	
