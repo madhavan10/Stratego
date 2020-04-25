@@ -22,7 +22,7 @@ import java.util.concurrent.Executors;
 public class StrategoServer {
 	
 	static final int PORT = 58901;
-	static final int SETUP_TIME_IN_MINUTES = 1;
+	static final int SETUP_TIME_IN_MINUTES = 2;
 	
 	public static void main(String[] args) throws Exception {
         try (ServerSocket listener = new ServerSocket(PORT)) {
