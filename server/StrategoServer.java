@@ -15,7 +15,9 @@ import java.util.concurrent.Executors;
  * YOUR_TEAM <team as boolean>
  * SETUP_TIME_OVER
  * MOVE_OK
- * OTHER_PLAYER_MOVED <x1><y1><x2><y2>
+ * OPPONENT_MOVED <x1><y1><x2><y2>
+ * VICTORY
+ * DEFEAT
  * OTHER_PLAYER_LEFT
  * MESSAGE <text>
  */

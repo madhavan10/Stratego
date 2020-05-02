@@ -45,7 +45,6 @@ public class Stratego extends JFrame {
 		}
 		final String serverIP = args[0];
 		final Stratego frame = new Stratego(serverIP);
-		frame.initUI();
 		frame.setVisible(true);
 		frame.play();
 	}
@@ -165,9 +164,10 @@ public class Stratego extends JFrame {
 		socket = new Socket(serverIP, 58901);
 		in = new Scanner(socket.getInputStream());
 		out = new PrintWriter(socket.getOutputStream(), true);
+		initUI();
 	}
 	
-	public void initUI() {
+	private void initUI() {
 		setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
 		setTitle("Stratego");
 		setBounds(100, 100, 768, 768);
