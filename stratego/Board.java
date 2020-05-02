@@ -40,21 +40,6 @@ public class Board extends JPanel {
 			isSetupTime = true;
 			selected = null;
 		}
-		
-		public void hideEnemyPieces() {
-			for(Piece piece: whitePieces) {
-				if(piece.getTeam() != playerTeam) {
-					piece.setVisible(false);
-				}
-			}
-			for(Piece piece: blackPieces) {
-				if(piece.getTeam() != playerTeam) {
-					piece.setVisible(false);
-				}
-			}
-			repaint();
-			revalidate();
-		}
 
 		public void setIsMyTurn(boolean b) {
 			isMyTurn = b;
@@ -133,6 +118,21 @@ public class Board extends JPanel {
 				}
 			}
 		} //end method
+		
+		private void hideEnemyPieces() {
+			for(Piece piece: whitePieces) {
+				if(piece.getTeam() != playerTeam) {
+					piece.setVisible(false);
+				}
+			}
+			for(Piece piece: blackPieces) {
+				if(piece.getTeam() != playerTeam) {
+					piece.setVisible(false);
+				}
+			}
+			repaint();
+			revalidate();
+		}
 		
 		private void createPieces() {
 			int i = 0;
@@ -227,9 +227,7 @@ public class Board extends JPanel {
 			for(int j = 0; j < 4; j++) {
 				for(int i = 0; i < 10; i++) {
 					Piece p = whitePieces[count];
-					//p.setPos(i, j);
 					board[i][j].setOccupant(p);
-					board[i][j].setOccupied(true);
 					board[i][j].add(p, BorderLayout.CENTER);
 					count++;
 				}
@@ -240,9 +238,7 @@ public class Board extends JPanel {
 			for(int j = 9; j >= 6; j--) {
 				for(int i = 0; i < 10; i++) {
 					Piece p = blackPieces[count];
-					//blackPieces[count].setPos(i, j);
 					board[i][j].setOccupant(p);
-					board[i][j].setOccupied(true);
 					board[i][j].add(p, BorderLayout.CENTER);
 					count++;
 				}
@@ -250,23 +246,24 @@ public class Board extends JPanel {
 			shadeOccupiedSquares();
 		}
 
-                private void refreshBorders() {
-                    for(int j = 0; j < BOARD_DIM; j++)
-                        for(int i = 0; i < BOARD_DIM; i++)
-                            board[i][j].setBorder(BorderFactory.createLineBorder(Color.black));
-                    repaint();
-                    revalidate();
-                }
+		private void refreshBorders() {
+			for(int j = 0; j < BOARD_DIM; j++)
+				for(int i = 0; i < BOARD_DIM; i++)
+					if(!board[i][j].isForbidden())
+						board[i][j].setBorder(BorderFactory.createLineBorder(Color.black));
+			repaint();
+			revalidate();
+		}
 
-                private void setLastMoveBorder(Square s) {
-                    s.setBorder(BorderFactory.createLineBorder(Color.green));
-                }
+		private void setLastMoveBorder(Square s) {
+			s.setBorder(BorderFactory.createLineBorder(Color.green));
+		}
 		
 		private void shadeOccupiedSquares() {
 			for(int j = 0; j <= 9; j++) {
 				for(int i = 0; i <= 9; i++) {
 					if(board[i][j].isOccupied()) {
-                                                Color color = board[i][j].getOccupant().getTeam() ? Color.yellow : Color.darkGray;
+						Color color = board[i][j].getOccupant().getTeam() ? Color.yellow : Color.darkGray;
 						board[i][j].setBackground(color);
                                         }
 					else if(!board[i][j].isForbidden())
@@ -346,12 +343,10 @@ public class Board extends JPanel {
 			boolean flag = false;
 			if(!square2.isOccupied()) {	
 				square2.setOccupant(square1.getOccupant());
-				square2.setOccupied(true);
 				square2.add(square1.getOccupant());
 			        	
 				square1.remove(square1.getOccupant());
 				square1.setOccupant(null);
-				square1.setOccupied(false);
 			}
 			else {
 				//clash
@@ -365,23 +360,19 @@ public class Board extends JPanel {
 
 					square1.remove(square1.getOccupant());
 					square1.setOccupant(null);
-					square1.setOccupied(false);
 					
 				}
 				else if(square1.getOccupant().clash(square2.getOccupant()) < 0) {
 					square1.remove(square1.getOccupant());
 					square1.setOccupant(null);
-					square1.setOccupied(false);
 					square2.getOccupant().setVisible(true);
 				}
 				else {
 					updateEventLabel("Tie with " + square2.getOccupant());
 					square1.remove(square1.getOccupant());
 					square1.setOccupant(null);
-					square1.setOccupied(false);
 					square2.remove(square2.getOccupant());
 					square2.setOccupant(null);
-					square2.setOccupied(false);
 				}
 			}
 			shadeOccupiedSquares();
@@ -409,13 +400,11 @@ public class Board extends JPanel {
 			}
 			if(!square2.isOccupied()) {
 				square2.setOccupant(square1.getOccupant());
-				square2.setOccupied(true);
 				square2.add(square1.getOccupant());
 				setLastMoveBorder(square2);
 				
 				square1.remove(square1.getOccupant());
 				square1.setOccupant(null);
-				square1.setOccupied(false);
 			}
 			else {
 				//clash
@@ -429,7 +418,6 @@ public class Board extends JPanel {
 
 					square1.remove(square1.getOccupant());
 					square1.setOccupant(null);
-					square1.setOccupied(false);
 					
 				}
 				else if(square1.getOccupant().clash(square2.getOccupant()) < 0) {
@@ -438,16 +426,13 @@ public class Board extends JPanel {
 					
 					square1.remove(square1.getOccupant());
 					square1.setOccupant(null);
-					square1.setOccupied(false);
 				}
 				else {
 					updateEventLabel("Tie with " + square1.getOccupant());
 					square1.remove(square1.getOccupant());
 					square1.setOccupant(null);
-					square1.setOccupied(false);
 					square2.remove(square2.getOccupant());
 					square2.setOccupant(null);
-					square2.setOccupied(false);
 					setLastMoveBorder(square2);
 				}
 			}
@@ -529,8 +514,5 @@ public class Board extends JPanel {
 		public static final int NO_OF_PIECES = 40;
 		public static final int BOARD_DIM = 10;
 		public static final boolean ORC = false;
-		public static final boolean HUMAN = true;
-
-
-		
+		public static final boolean HUMAN = true;	
 	} //end class
