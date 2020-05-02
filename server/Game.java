@@ -108,9 +108,10 @@ public class Game {
 					calls++;
 					team = !(player1.team);
 				} catch (NullPointerException e) {
+					output.println("MESSAGE Waiting for other player to choose team");
 					Thread.sleep(5000);
 					if(calls == 36) {
-						output.println("MESSAGE Waited too long for other player - terminating connection to server.");
+						output.println("MESSAGE Waited too long for other player - terminating connection to server");
 						throw new Exception("Waited too long for other player to choose team");
 					}
 					setup();
