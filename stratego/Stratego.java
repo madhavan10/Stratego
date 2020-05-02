@@ -267,6 +267,12 @@ public class Stratego extends JFrame {
 			isSetupTime = false;
 		}
 		
+		public void updateEventLabel(String s) {
+			eventLabel.setText(s);
+			eventLabel.repaint();
+			eventLabel.revalidate();
+		}
+			
 		public String toString() {
 			String result = "";
 			for(int j = 0; j < BOARD_DIM; j++) {
@@ -497,9 +503,7 @@ public class Stratego extends JFrame {
 				if(square2.getOccupant().getLevel() == Piece.FLAG)
 					flag = true;
 				if(square1.getOccupant().clash(square2.getOccupant()) > 0) {
-					eventLabel.setText("You captured " + square2.getOccupant());
-					eventLabel.repaint();
-					eventLabel.revalidate();
+					updateEventLabel("You captured " + square2.getOccupant());
 					square2.remove(square2.getOccupant());
 					square2.setOccupant(square1.getOccupant());
 					square2.add(square1.getOccupant());
@@ -516,9 +520,7 @@ public class Stratego extends JFrame {
 					square2.getOccupant().setVisible(true);
 				}
 				else {
-					eventLabel.setText("Tie with " + square2.getOccupant());
-					eventLabel.repaint();
-					eventLabel.revalidate();
+					updateEventLabel("Tie with " + square2.getOccupant());
 					square1.remove(square1.getOccupant());
 					square1.setOccupant(null);
 					square1.setOccupied(false);
@@ -563,9 +565,7 @@ public class Stratego extends JFrame {
 			else {
 				//clash
 				if(square1.getOccupant().clash(square2.getOccupant()) > 0) {
-					eventLabel.setText("You lost " + square2.getOccupant());
-					eventLabel.repaint();
-					eventLabel.revalidate();
+					updateEventLabel("You lost " + square2.getOccupant());
 					square2.remove(square2.getOccupant());
 					square2.setOccupant(square1.getOccupant());
 					square2.add(square1.getOccupant());
@@ -578,9 +578,7 @@ public class Stratego extends JFrame {
 					
 				}
 				else if(square1.getOccupant().clash(square2.getOccupant()) < 0) {
-					eventLabel.setText("Opponent lost " + square1.getOccupant());
-					eventLabel.repaint();
-					eventLabel.revalidate();
+					updateEventLabel("Opponent lost " + square1.getOccupant());
                                         setLastMoveBorder(square2);
 					
                                         square1.remove(square1.getOccupant());
@@ -588,9 +586,7 @@ public class Stratego extends JFrame {
 					square1.setOccupied(false);
 				}
 				else {
-					eventLabel.setText("Tie with " + square1.getOccupant());
-					eventLabel.repaint();
-					eventLabel.revalidate();
+					updateEventLabel("Tie with " + square1.getOccupant());
 					square1.remove(square1.getOccupant());
 					square1.setOccupant(null);
 					square1.setOccupied(false);
