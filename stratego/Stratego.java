@@ -39,11 +39,7 @@ public class Stratego extends JFrame {
 	 * @throws InterruptedException 
 	 */
 	public static void main(String[] args) throws IOException, InterruptedException {
-		if(args.length != 1) {
-			System.err.println("Pass the IP of the Server as the sole command-line argument");
-			return;
-		}
-		final String serverIP = args[0];
+		final String serverIP = JOptionPane.showInputDialog("Enter Server address");
 		final Stratego frame = new Stratego(serverIP);
 		frame.setVisible(true);
 		frame.play();

@@ -256,7 +256,7 @@ public class Board extends JPanel {
 		}
 
 		private void setLastMoveBorder(Square s) {
-			s.setBorder(BorderFactory.createLineBorder(Color.green));
+			s.setBorder(BorderFactory.createLineBorder(Color.blue));
 		}
 		
 		private void shadeOccupiedSquares() {
