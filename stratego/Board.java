@@ -10,6 +10,8 @@ import java.io.PrintWriter;
 
 import javax.swing.BorderFactory;
 import javax.swing.JLabel;
+import javax.swing.JButton;
+import java.util.ArrayList;
 import javax.swing.JPanel;
 
 
@@ -27,12 +29,15 @@ public class Board extends JPanel {
 		private Square target;
 		private boolean isMyTurn;
 		private boolean usingSpecialPower;
+		private String specialPower;
 		
 		private final PrintWriter out;
+		private final JPanel spPanel;
 		private final JLabel eventLabel;
 		
-		public Board(PrintWriter out, JLabel eventLabel) {
+		public Board(PrintWriter out, JPanel spPanel, JLabel eventLabel) {
 			this.out = out;
+			this.spPanel = spPanel;
 			this.eventLabel = eventLabel;
 			setLayout(new GridLayout(BOARD_DIM, BOARD_DIM));
 			createSquares();
@@ -538,6 +543,16 @@ public class Board extends JPanel {
 						selected.removeSelectedBorder();
 					selected = square;
 					selected.setSelectedBorder();
+					for(String name : square.getOccupant().getSpecialPowerNames()) {
+						JButton spButton = new JButton(name);
+						spButton.addMouseListener(new MouseAdapter() {
+							public void mouseClicked(MouseEvent e) {
+								usingSpecialPower = true;
+								specialPower = name;
+							}
+						});
+						spPanel.add(spButton);
+					}
 				}
 			}
 			

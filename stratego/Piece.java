@@ -41,9 +41,27 @@ public class Piece extends JLabel {
 		setForeground(team ? Color.BLACK : Color.WHITE);
 		setFont(new Font("Arial", Font.BOLD, 12));
 	}
+
+	public Piece(int level, String name, boolean team, String spName) {
+		this.level = level;
+		this.name = name;
+		this.team = team;
+		specialPowerNames = new ArrayList<String>();
+		specialPowerNames.add(spName);
+		special = true;
+		isDead = false;
+		
+		setText(this.toString());
+		setForeground(team ? Color.BLACK : Color.WHITE);
+		setFont(new Font("Arial", Font.BOLD, 12));
+	}
 	
 	public boolean isDead() {
 		return isDead;
+	}
+
+	public ArrayList<String> getSpecialPowerNames() {
+		return specialPowerNames;
 	}
 
 	public void die() {
@@ -69,6 +87,8 @@ public class Piece extends JLabel {
 			return "Flag";
 		if(level == SPY)
 			return "Spy";
+		if(special)
+			return name;
 		return "" + level;
 	}
 

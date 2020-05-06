@@ -90,7 +90,7 @@ public class Stratego extends JFrame {
 		spPanel = new JPanel();
 		
 		auxPanel = new JPanel();
-		board = new Board(out, eventLabel);
+		board = new Board(out, spPanel, eventLabel);
 		
 		Container contentPane = getContentPane();
 		contentPane.add(board, BorderLayout.CENTER);
