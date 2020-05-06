@@ -2,6 +2,7 @@ package stratego;
 
 import java.awt.Color;
 import java.awt.Font;
+import java.util.ArrayList;
 
 import javax.swing.JLabel;
 
@@ -11,16 +12,29 @@ public class Piece extends JLabel {
 	final int level;
 	final String name;
 	final boolean team;
-	
+	private boolean special;
+	private ArrayList<String> specialPowerNames;
 	private boolean isDead;
-	//private int xPos, yPos;
 	
 	public Piece(int level, String name, boolean team) {
 		
 		this.level = level;
 		this.name = name;
 		this.team = team;
+		special = false;
+		isDead = false;
 		
+		setText(this.toString());
+		setForeground(team ? Color.BLACK : Color.WHITE);
+		setFont(new Font("Arial", Font.BOLD, 12));
+	}
+	
+	public Piece(int level, String name, boolean team, ArrayList<String> specialPowerNames) {
+		this.level = level;
+		this.name = name;
+		this.team = team;
+		this.specialPowerNames = specialPowerNames;
+		special = specialPowerNames.size() > 0;
 		isDead = false;
 		
 		setText(this.toString());

@@ -38,7 +38,7 @@ public class Stratego extends JFrame {
 	 * @throws IOException 
 	 * @throws InterruptedException 
 	 */
-	public static void main(String[] args) throws IOException, InterruptedException {
+	public static void main(String[] args) throws IOException {
 		if(args.length != 1) {
 			System.err.println("Pass the IP of the Server as the sole command-line argument");
 			return;
@@ -47,6 +47,60 @@ public class Stratego extends JFrame {
 		final Stratego frame = new Stratego(serverIP);
 		frame.setVisible(true);
 		frame.play();
+	}
+	
+	private Socket socket;
+	private Scanner in;
+	private PrintWriter out;
+	
+	private JPanel auxPanel;
+	private Board board;
+	
+	private JPanel spPanel;
+	private JPanel messagePanel;
+	private JLabel messageLabel;
+	private JLabel eventLabel;
+	
+	
+	/**
+	 * Create the frame.
+	 * @param serverIP 
+	 */
+	public Stratego(String serverIP) throws IOException {
+		socket = new Socket(serverIP, 58901);
+		in = new Scanner(socket.getInputStream());
+		out = new PrintWriter(socket.getOutputStream(), true);
+		initUI();
+	}
+	
+	private void initUI() {
+		setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
+		setTitle("Stratego");
+		setSize(768, 768);
+		
+		messagePanel = new JPanel();
+		messageLabel = new JLabel("...");
+		messageLabel.setHorizontalAlignment(SwingConstants.LEFT);
+		messageLabel.setFont(new Font("Arial", Font.PLAIN, 16));
+		
+		eventLabel = new JLabel("...");
+		eventLabel.setFont(new Font("Arial", Font.PLAIN, 16));
+		eventLabel.setHorizontalAlignment(SwingConstants.RIGHT);
+		
+		spPanel = new JPanel();
+		
+		auxPanel = new JPanel();
+		board = new Board(out, eventLabel);
+		
+		Container contentPane = getContentPane();
+		contentPane.add(board, BorderLayout.CENTER);
+		contentPane.add(auxPanel, BorderLayout.SOUTH);
+		
+		auxPanel.setLayout(new BorderLayout());
+		auxPanel.add(spPanel, BorderLayout.NORTH);
+		auxPanel.add(messagePanel, BorderLayout.SOUTH);
+		messagePanel.add(messageLabel);
+		messagePanel.add(eventLabel);
 	}
 	
 	protected void play() {
@@ -141,52 +195,7 @@ public class Stratego extends JFrame {
 				JOptionPane.showMessageDialog(this, "End");
 				break;
 			}
-			//System.out.println("end of loop body");
-		}
-		//System.out.println("end of method body");
-		
-	}
-
-	private Socket socket;
-	private Scanner in;
-	private PrintWriter out;
-	
-	private JPanel messagePanel;
-	private JLabel messageLabel;
-	private JLabel eventLabel;
-	private Board board;
-	
-	/**
-	 * Create the frame.
-	 * @param serverIP 
-	 */
-	public Stratego(String serverIP) throws IOException {
-		socket = new Socket(serverIP, 58901);
-		in = new Scanner(socket.getInputStream());
-		out = new PrintWriter(socket.getOutputStream(), true);
-		initUI();
-	}
-	
-	private void initUI() {
-		setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
-		setTitle("Stratego");
-		setBounds(100, 100, 768, 768);
-		
-		messagePanel = new JPanel();
-		messageLabel = new JLabel("...");
-		messageLabel.setHorizontalAlignment(SwingConstants.LEFT);
-		messageLabel.setFont(new Font("Arial", Font.PLAIN, 16));
-		
-		eventLabel = new JLabel("...");
-		eventLabel.setFont(new Font("Arial", Font.PLAIN, 16));
-		eventLabel.setHorizontalAlignment(SwingConstants.RIGHT);
-		board = new Board(out, eventLabel);
-		
-		Container contentPane = getContentPane();
-		contentPane.add(messagePanel, BorderLayout.SOUTH);
-		contentPane.add(board, BorderLayout.CENTER);
-		messagePanel.add(messageLabel, BorderLayout.NORTH);
-		messagePanel.add(eventLabel, BorderLayout.CENTER);
+		}	
 	}
 	
 }

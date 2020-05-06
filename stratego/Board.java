@@ -26,6 +26,7 @@ public class Board extends JPanel {
 		private Square selected;
 		private Square target;
 		private boolean isMyTurn;
+		private boolean usingSpecialPower;
 		
 		private final PrintWriter out;
 		private final JLabel eventLabel;
@@ -75,7 +76,7 @@ public class Board extends JPanel {
 		public void setupTimeOver() {
 			isSetupTime = false;
 		}
-		
+
 		public void updateEventLabel(String s) {
 			eventLabel.setText(s);
 			eventLabel.repaint();
@@ -255,9 +256,6 @@ public class Board extends JPanel {
 			revalidate();
 		}
 
-		private void setLastMoveBorder(Square s) {
-			s.setBorder(BorderFactory.createLineBorder(Color.green));
-		}
 		
 		private void shadeOccupiedSquares() {
 			for(int j = 0; j <= 9; j++) {
@@ -401,7 +399,7 @@ public class Board extends JPanel {
 			if(!square2.isOccupied()) {
 				square2.setOccupant(square1.getOccupant());
 				square2.add(square1.getOccupant());
-				setLastMoveBorder(square2);
+				square2.setLastMoveBorder();
 				
 				square1.remove(square1.getOccupant());
 				square1.setOccupant(null);
@@ -414,15 +412,14 @@ public class Board extends JPanel {
 					square2.setOccupant(square1.getOccupant());
 					square2.add(square1.getOccupant());
 					square2.getOccupant().setVisible(true);
-					setLastMoveBorder(square2);
-
+					
 					square1.remove(square1.getOccupant());
 					square1.setOccupant(null);
 					
 				}
 				else if(square1.getOccupant().clash(square2.getOccupant()) < 0) {
 					updateEventLabel("Opponent lost " + square1.getOccupant());
-					setLastMoveBorder(square2);
+					square2.setLastMoveBorder();
 					
 					square1.remove(square1.getOccupant());
 					square1.setOccupant(null);
@@ -433,7 +430,7 @@ public class Board extends JPanel {
 					square1.setOccupant(null);
 					square2.remove(square2.getOccupant());
 					square2.setOccupant(null);
-					setLastMoveBorder(square2);
+					square2.setLastMoveBorder();
 				}
 			}
 			shadeOccupiedSquares();
@@ -443,11 +440,18 @@ public class Board extends JPanel {
 			@Override
 			public void mouseDragged(MouseEvent e) {
 				//System.out.println("Mouse Dragged!");
+			
 				Square square = (Square) e.getSource();
-				if(square.isOccupied() && square.getOccupant().getTeam() == playerTeam)
+				if(square.isOccupied() && square.getOccupant().getTeam() == playerTeam) {
+					if(selected != null) 
+						selected.removeSelectedBorder();
 					selected = square;
-				else
+				}
+				else {
+					if(selected != null) 
+						selected.removeSelectedBorder();
 					selected = null;
+				}
 			}
 		}
 		
@@ -484,6 +488,17 @@ public class Board extends JPanel {
 			}
 			
 			@Override
+			public void mousePressed(MouseEvent e) {
+				if(isSetupTime)
+					return;
+				if(!usingSpecialPower) {
+					if(selected != null)
+						selected.removeSelectedBorder();
+					selected = target = null;
+				}
+			}
+			
+			@Override
 			public void mouseReleased(MouseEvent e) {
 				//System.out.println("Mouse Released!");
 				if(target == null) {
@@ -509,10 +524,25 @@ public class Board extends JPanel {
 				}
 			}
 			
+			@Override
+			public void mouseClicked(MouseEvent e) {
+				if(isSetupTime)
+					return;
+				Square square = (Square) e.getSource();
+				if(square.isOccupied() && square.getOccupant().getTeam() == playerTeam) {
+					if(selected != null)
+						selected.removeSelectedBorder();
+					selected = square;
+					selected.setSelectedBorder();
+				}
+			}
+			
 		}
 		
 		public static final int NO_OF_PIECES = 40;
 		public static final int BOARD_DIM = 10;
 		public static final boolean ORC = false;
-		public static final boolean HUMAN = true;	
+		public static final boolean HUMAN = true;
+
+	
 	} //end class

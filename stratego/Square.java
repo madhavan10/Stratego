@@ -1,5 +1,8 @@
 package stratego;
 
+import java.awt.Color;
+
+import javax.swing.BorderFactory;
 import javax.swing.JPanel;
 
 @SuppressWarnings("serial")
@@ -38,6 +41,18 @@ public class Square extends JPanel {
 			isOccupied = false;
 		else
 			isOccupied = true;
+	}
+	
+	public void setLastMoveBorder() {
+		setBorder(BorderFactory.createLineBorder(Color.green));
+	}
+	
+	public void setSelectedBorder() {
+		setBorder(BorderFactory.createLineBorder(Color.red));
+	}
+	
+	public void removeSelectedBorder() {
+		setBorder(BorderFactory.createLineBorder(Color.black));
 	}
 	
 	public String toString() {
