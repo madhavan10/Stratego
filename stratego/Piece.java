@@ -34,7 +34,7 @@ public class Piece extends JLabel {
 		this.name = name;
 		this.team = team;
 		this.specialPowerNames = specialPowerNames;
-		special = specialPowerNames.size() > 0;
+		special = specialPowerNames != null && specialPowerNames.size() > 0;
 		isDead = false;
 		
 		setText(this.toString());

@@ -137,21 +137,25 @@ public class Board extends JPanel {
 		
 		private void createPieces() {
 			int i = 0;
-			whitePieces[i] = new Piece(10, "Gandalf", HUMAN); i++;
-			whitePieces[i] = new Piece(9, "Aragorn", HUMAN); i++;
-			whitePieces[i] = new Piece(8, "Legolas", HUMAN); i++;
-			whitePieces[i] = new Piece(8, "Gimli", HUMAN); i++;
-			whitePieces[i] = new Piece(7, "Faramir", HUMAN); i++;		
-			whitePieces[i] = new Piece(7, "Theoden", HUMAN); i++;		
+
+			whitePieces[i] = new Piece(10, "Gandalf", HUMAN, "Flight"); i++;
+			whitePieces[i] = new Piece(9, "Aragorn", HUMAN, "Detect Enemy"); i++;
+			ArrayList<String> tmp = new ArrayList<String>();
+			tmp.add("Detect Enemy");
+			tmp.add("Longbow");
+			whitePieces[i] = new Piece(8, "Legolas", HUMAN, tmp); i++;
+			whitePieces[i] = new Piece(8, "Gimli", HUMAN, "Dwarven Axe"); i++;
+			whitePieces[i] = new Piece(7, "Faramir", HUMAN, "Longbow"); i++;		
+			whitePieces[i] = new Piece(7, "Theoden", HUMAN, "Swift Steed"); i++;		
 			whitePieces[i] = new Piece(7, "Eomer", HUMAN); i++;
 			whitePieces[i] = new Piece(6, "Haldir", HUMAN); i++;		
 			whitePieces[i] = new Piece(6, "Arwen", HUMAN); i++;		
 			whitePieces[i] = new Piece(6, "Treebeard", HUMAN); i++;		
 			whitePieces[i] = new Piece(6, "Boromir", HUMAN); i++;		
-			whitePieces[i] = new Piece(5, "Elf-1", HUMAN); i++;		
-			whitePieces[i] = new Piece(5, "Elf-2", HUMAN); i++;		
-			whitePieces[i] = new Piece(5, "Elf-3", HUMAN); i++;		
-			whitePieces[i] = new Piece(5, "Elf-4", HUMAN); i++;		
+			whitePieces[i] = new Piece(5, "Elf-1", HUMAN, "Longbow"); i++;		
+			whitePieces[i] = new Piece(5, "Elf-2", HUMAN, "Longbow"); i++;		
+			whitePieces[i] = new Piece(5, "Elf-3", HUMAN, "Longbow"); i++;		
+			whitePieces[i] = new Piece(5, "Elf-4", HUMAN, "Longbow"); i++;		
 			whitePieces[i] = new Piece(4, "Merry", HUMAN); i++;		
 			whitePieces[i] = new Piece(4, "Pippin", HUMAN); i++;		
 			whitePieces[i] = new Piece(4, "Frodo", HUMAN); i++;		
@@ -179,8 +183,8 @@ public class Board extends JPanel {
 			whitePieces[i] = new Piece(Piece.FLAG, "Flag", HUMAN); i++;
 			
 			int j = 0;
-			blackPieces[j] = new Piece(10, "Witch King", ORC); j++;
-			blackPieces[j] = new Piece(9, "Saruman", ORC); j++;
+			blackPieces[j] = new Piece(10, "Witch King", ORC, "Flight"); j++;
+			blackPieces[j] = new Piece(9, "Saruman", ORC, "Detect Enemy"); j++;
 			blackPieces[j] = new Piece(8, "Ringwraith-1", ORC); j++;
 			blackPieces[j] = new Piece(8, "Ringwraith-2", ORC); j++;
 			blackPieces[j] = new Piece(7, "Gothmog", ORC); j++;		
@@ -190,14 +194,14 @@ public class Board extends JPanel {
 			blackPieces[j] = new Piece(6, "Uruk-2", ORC); j++;
 			blackPieces[j] = new Piece(6, "Uruk-3", ORC); j++;
 			blackPieces[j] = new Piece(6, "Uruk-4", ORC); j++;
-			blackPieces[j] = new Piece(5, "Beserker-1", ORC); j++;
-			blackPieces[j] = new Piece(5, "Beserker-2", ORC); j++;
-			blackPieces[j] = new Piece(5, "Beserker-3", ORC); j++;
-			blackPieces[j] = new Piece(5, "Beserker-4", ORC); j++;
-			blackPieces[j] = new Piece(4, "Haradrim-1", ORC); j++;
-			blackPieces[j] = new Piece(4, "Haradrim-2", ORC); j++;
-			blackPieces[j] = new Piece(4, "Haradrim-3", ORC); j++;
-			blackPieces[j] = new Piece(4, "Haradrim-4", ORC); j++;
+			blackPieces[j] = new Piece(5, "Beserker-1", ORC, "Rampage"); j++;
+			blackPieces[j] = new Piece(5, "Beserker-2", ORC, "Rampage"); j++;
+			blackPieces[j] = new Piece(5, "Beserker-3", ORC, "Rampage"); j++;
+			blackPieces[j] = new Piece(5, "Beserker-4", ORC, "Rampage"); j++;
+			blackPieces[j] = new Piece(4, "Haradrim-1", ORC, "Longbow"); j++;
+			blackPieces[j] = new Piece(4, "Haradrim-2", ORC, "Longbow"); j++;
+			blackPieces[j] = new Piece(4, "Haradrim-3", ORC, "Longbow"); j++;
+			blackPieces[j] = new Piece(4, "Haradrim-4", ORC, "Longbow"); j++;
 			blackPieces[j] = new Piece(3, "Orc-1", ORC); j++;
 			blackPieces[j] = new Piece(3, "Orc-2", ORC); j++;
 			blackPieces[j] = new Piece(3, "Orc-3", ORC); j++;
