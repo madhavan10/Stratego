@@ -32,6 +32,7 @@ public class Board extends JPanel {
 		private String specialPower;
 		private JLabel spMessage;
 		
+		private final SPSM sm; = new SPSM();
 		private final PrintWriter out;
 		private final JPanel spPanel;
 		private final JLabel eventLabel;
@@ -39,6 +40,8 @@ public class Board extends JPanel {
 		public Board(PrintWriter out, JPanel spPanel, JLabel eventLabel) {
 			this.out = out;
 			this.spPanel = spPanel;
+			spMessage = new JLabel("...");
+			spPanel.add(spMessage);
 			this.eventLabel = eventLabel;
 			setLayout(new GridLayout(BOARD_DIM, BOARD_DIM));
 			createSquares();
@@ -589,7 +592,9 @@ public class Board extends JPanel {
 					spPanel.repaint();
 					spPanel.revalidate();
 					if(specialPower.equals("DWARVEN_AXE")) {
-						
+						spMessage.setText("Choose square from which to use dwarven axe");
+						spMessage.repaint();
+						spMessage.revalidate();
 
 					}
 				}
