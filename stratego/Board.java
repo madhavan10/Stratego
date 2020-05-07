@@ -105,11 +105,12 @@ public class Board extends JPanel {
 						board[i][j] = new Square(i, j, forbidden);
 						square = board[i][j];
 						square.setBackground(Color.blue);
-						add(square);
+						//add(square);
 					}			
 					else {
 						board[i][j] = new Square(i, j, !forbidden);
 						square = board[i][j];
+						square.setBackground(Color.white);
 						square.setBorder(BorderFactory.createLineBorder(Color.black));
 					}
 					square.addMouseMotionListener(new SquareMotionListener());
@@ -218,6 +219,31 @@ public class Board extends JPanel {
 			blackPieces[j] = new Piece(Piece.STRONGHOLD, "Stronghold-5", ORC); j++;
 			blackPieces[j] = new Piece(Piece.STRONGHOLD, "Stronghold-6", ORC); j++;
 			blackPieces[j] = new Piece(Piece.FLAG, "Flag", ORC); j++;
+
+			shufflePieces();
+		}
+
+		private void shufflePieces() {
+			for(int i = 0; i < 100; i++) {
+				int r1 = getRandomInt();
+				int r2 = getRandomInt();
+
+				//swap
+				Piece tmp = whitePieces[r1];
+				whitePieces[r1] = whitePieces[r2];
+				whitePieces[r2] = tmp;
+
+				r1 = getRandomInt();
+				r2 = getRandomInt();
+				//swap
+				tmp = blackPieces[r1];
+				blackPieces[r1] = blackPieces[r2];
+				blackPieces[r2] = tmp;
+			}
+		}
+
+		private static int getRandomInt() {
+			return (int) (Math.random() * 40);
 		}
 		
 		private void setPieces() {
@@ -256,18 +282,18 @@ public class Board extends JPanel {
 		}
 
 		private void setLastMoveBorder(Square s) {
-			s.setBorder(BorderFactory.createLineBorder(Color.blue));
+			s.setBorder(BorderFactory.createLineBorder(Color.green, 5, true));
 		}
 		
 		private void shadeOccupiedSquares() {
 			for(int j = 0; j <= 9; j++) {
 				for(int i = 0; i <= 9; i++) {
 					if(board[i][j].isOccupied()) {
-						Color color = board[i][j].getOccupant().getTeam() ? Color.yellow : Color.darkGray;
+						Color color = board[i][j].getOccupant().getTeam() ? Color.gray : Color.darkGray;
 						board[i][j].setBackground(color);
                                         }
 					else if(!board[i][j].isForbidden())
-						board[i][j].setBackground(Color.gray);
+						board[i][j].setBackground(Color.white);
 					else
 						board[i][j].setBackground(Color.blue);
 				}
