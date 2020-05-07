@@ -45,14 +45,17 @@ public class Square extends JPanel {
 	
 	public void setLastMoveBorder() {
 		setBorder(BorderFactory.createLineBorder(Color.green));
+		repaint();
 	}
 	
 	public void setSelectedBorder() {
 		setBorder(BorderFactory.createLineBorder(Color.red));
+		repaint();
 	}
 	
 	public void removeSelectedBorder() {
 		setBorder(BorderFactory.createLineBorder(Color.black));
+		repaint();
 	}
 	
 	public String toString() {

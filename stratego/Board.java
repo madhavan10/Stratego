@@ -30,6 +30,7 @@ public class Board extends JPanel {
 		private boolean isMyTurn;
 		private boolean usingSpecialPower;
 		private String specialPower;
+		private JLabel spMessage;
 		
 		private final PrintWriter out;
 		private final JPanel spPanel;
@@ -143,24 +144,24 @@ public class Board extends JPanel {
 		private void createPieces() {
 			int i = 0;
 
-			whitePieces[i] = new Piece(10, "Gandalf", HUMAN, "Flight"); i++;
-			whitePieces[i] = new Piece(9, "Aragorn", HUMAN, "Detect Enemy"); i++;
+			whitePieces[i] = new Piece(10, "Gandalf", HUMAN, "FLIGHT"); i++;
+			whitePieces[i] = new Piece(9, "Aragorn", HUMAN, "DETECT_ENEMY"); i++;
 			ArrayList<String> tmp = new ArrayList<String>();
-			tmp.add("Detect Enemy");
-			tmp.add("Longbow");
+			tmp.add("DETECT_ENEMY");
+			tmp.add("LONGBOW");
 			whitePieces[i] = new Piece(8, "Legolas", HUMAN, tmp); i++;
-			whitePieces[i] = new Piece(8, "Gimli", HUMAN, "Dwarven Axe"); i++;
-			whitePieces[i] = new Piece(7, "Faramir", HUMAN, "Longbow"); i++;		
-			whitePieces[i] = new Piece(7, "Theoden", HUMAN, "Swift Steed"); i++;		
+			whitePieces[i] = new Piece(8, "Gimli", HUMAN, "DWARVEN_AXE"); i++;
+			whitePieces[i] = new Piece(7, "Faramir", HUMAN, "LONGBOW"); i++;		
+			whitePieces[i] = new Piece(7, "Theoden", HUMAN, "SWIFT_STEED"); i++;		
 			whitePieces[i] = new Piece(7, "Eomer", HUMAN); i++;
 			whitePieces[i] = new Piece(6, "Haldir", HUMAN); i++;		
 			whitePieces[i] = new Piece(6, "Arwen", HUMAN); i++;		
 			whitePieces[i] = new Piece(6, "Treebeard", HUMAN); i++;		
 			whitePieces[i] = new Piece(6, "Boromir", HUMAN); i++;		
-			whitePieces[i] = new Piece(5, "Elf-1", HUMAN, "Longbow"); i++;		
-			whitePieces[i] = new Piece(5, "Elf-2", HUMAN, "Longbow"); i++;		
-			whitePieces[i] = new Piece(5, "Elf-3", HUMAN, "Longbow"); i++;		
-			whitePieces[i] = new Piece(5, "Elf-4", HUMAN, "Longbow"); i++;		
+			whitePieces[i] = new Piece(5, "Elf-1", HUMAN, "LONGBOW"); i++;		
+			whitePieces[i] = new Piece(5, "Elf-2", HUMAN, "LONGBOW"); i++;		
+			whitePieces[i] = new Piece(5, "Elf-3", HUMAN, "LONGBOW"); i++;		
+			whitePieces[i] = new Piece(5, "Elf-4", HUMAN, "LONGBOW"); i++;		
 			whitePieces[i] = new Piece(4, "Merry", HUMAN); i++;		
 			whitePieces[i] = new Piece(4, "Pippin", HUMAN); i++;		
 			whitePieces[i] = new Piece(4, "Frodo", HUMAN); i++;		
@@ -188,8 +189,8 @@ public class Board extends JPanel {
 			whitePieces[i] = new Piece(Piece.FLAG, "Flag", HUMAN); i++;
 			
 			int j = 0;
-			blackPieces[j] = new Piece(10, "Witch King", ORC, "Flight"); j++;
-			blackPieces[j] = new Piece(9, "Saruman", ORC, "Detect Enemy"); j++;
+			blackPieces[j] = new Piece(10, "Witch King", ORC, "FLIGHT"); j++;
+			blackPieces[j] = new Piece(9, "Saruman", ORC, "DETECT_ENEMY"); j++;
 			blackPieces[j] = new Piece(8, "Ringwraith-1", ORC); j++;
 			blackPieces[j] = new Piece(8, "Ringwraith-2", ORC); j++;
 			blackPieces[j] = new Piece(7, "Gothmog", ORC); j++;		
@@ -199,14 +200,14 @@ public class Board extends JPanel {
 			blackPieces[j] = new Piece(6, "Uruk-2", ORC); j++;
 			blackPieces[j] = new Piece(6, "Uruk-3", ORC); j++;
 			blackPieces[j] = new Piece(6, "Uruk-4", ORC); j++;
-			blackPieces[j] = new Piece(5, "Beserker-1", ORC, "Rampage"); j++;
-			blackPieces[j] = new Piece(5, "Beserker-2", ORC, "Rampage"); j++;
-			blackPieces[j] = new Piece(5, "Beserker-3", ORC, "Rampage"); j++;
-			blackPieces[j] = new Piece(5, "Beserker-4", ORC, "Rampage"); j++;
-			blackPieces[j] = new Piece(4, "Haradrim-1", ORC, "Longbow"); j++;
-			blackPieces[j] = new Piece(4, "Haradrim-2", ORC, "Longbow"); j++;
-			blackPieces[j] = new Piece(4, "Haradrim-3", ORC, "Longbow"); j++;
-			blackPieces[j] = new Piece(4, "Haradrim-4", ORC, "Longbow"); j++;
+			blackPieces[j] = new Piece(5, "Beserker-1", ORC, "RAMPAGE"); j++;
+			blackPieces[j] = new Piece(5, "Beserker-2", ORC, "RAMPAGE"); j++;
+			blackPieces[j] = new Piece(5, "Beserker-3", ORC, "RAMPAGE"); j++;
+			blackPieces[j] = new Piece(5, "Beserker-4", ORC, "RAMPAGE"); j++;
+			blackPieces[j] = new Piece(4, "Haradrim-1", ORC, "LONGBOW"); j++;
+			blackPieces[j] = new Piece(4, "Haradrim-2", ORC, "LONGBOW"); j++;
+			blackPieces[j] = new Piece(4, "Haradrim-3", ORC, "LONGBOW"); j++;
+			blackPieces[j] = new Piece(4, "Haradrim-4", ORC, "LONGBOW"); j++;
 			blackPieces[j] = new Piece(3, "Orc-1", ORC); j++;
 			blackPieces[j] = new Piece(3, "Orc-2", ORC); j++;
 			blackPieces[j] = new Piece(3, "Orc-3", ORC); j++;
@@ -501,8 +502,12 @@ public class Board extends JPanel {
 				if(isSetupTime)
 					return;
 				if(!usingSpecialPower) {
-					if(selected != null)
+					if(selected != null) {
+						spPanel.removeAll();
+						spPanel.repaint();
+						spPanel.revalidate();
 						selected.removeSelectedBorder();
+					}
 					selected = target = null;
 				}
 			}
@@ -523,13 +528,15 @@ public class Board extends JPanel {
 						selected = target = null;
 						return;
 					}
-					if(isValidMove(selected, target)) {
-						movePiece(selected, target);
-						selected = target = null;
-						isMyTurn = false;
+					if(!usingSpecialPower) {
+						if(isValidMove(selected, target)) {
+							movePiece(selected, target);
+							selected = target = null;
+							isMyTurn = false;
+						}
+						else
+							selected = target = null;
 					}
-					else
-						selected = target = null;
 				}
 			}
 			
@@ -538,20 +545,52 @@ public class Board extends JPanel {
 				if(isSetupTime)
 					return;
 				Square square = (Square) e.getSource();
-				if(square.isOccupied() && square.getOccupant().getTeam() == playerTeam) {
-					if(selected != null)
+				if(!usingSpecialPower && square.isOccupied() && square.getOccupant().getTeam() == playerTeam) {
+					//new selection
+					if(selected != null) {
+						//remove all buttons and old border
+						spPanel.removeAll();
+						spPanel.repaint();
+						spPanel.revalidate();
 						selected.removeSelectedBorder();
+					}
 					selected = square;
 					selected.setSelectedBorder();
-					for(String name : square.getOccupant().getSpecialPowerNames()) {
-						JButton spButton = new JButton(name);
-						spButton.addMouseListener(new MouseAdapter() {
-							public void mouseClicked(MouseEvent e) {
-								usingSpecialPower = true;
-								specialPower = name;
-							}
-						});
-						spPanel.add(spButton);
+					if(square.getOccupant().isSpecial()) {
+						//add buttons for special power(s)
+						for(String name : square.getOccupant().getSpecialPowerNames()) {
+							JButton spButton = new JButton(name);
+							spButton.addMouseListener(new MouseAdapter() {
+								public void mouseClicked(MouseEvent e) {
+									usingSpecialPower = true;
+									specialPower = name;
+								}
+							});
+							spPanel.add(spButton);
+						}
+						spPanel.repaint();
+						spPanel.revalidate();
+					}
+				}
+				if(selected != null && usingSpecialPower) {
+					spPanel.removeAll();
+					JButton cancel;
+					cancel.addMouseListener(new MouseAdapter() {
+						public void mouseClicked(MouseEvent e) {
+							//remove cancel
+							spPanel.removeAll()
+							spPanel.repaint();
+							spPanel.revalidate();
+							selected.removeSelectedBorder();
+							selected = target = null;
+						}
+					})
+					spPanel.add(cancel);
+					spPanel.repaint();
+					spPanel.revalidate();
+					if(specialPower.equals("DWARVEN_AXE")) {
+						
+
 					}
 				}
 			}
@@ -562,6 +601,5 @@ public class Board extends JPanel {
 		public static final int BOARD_DIM = 10;
 		public static final boolean ORC = false;
 		public static final boolean HUMAN = true;
-
 	
 	} //end class
