@@ -13,7 +13,7 @@ public class Piece extends JLabel {
 	final String name;
 	final boolean team;
 	final boolean special;
-	final ArrayList<Integer> specialPowerNames;
+	final ArrayList<String> specialPowerNames;
 	private boolean isDead;
 	
 	public Piece(int level, String name, boolean team) {
@@ -21,6 +21,7 @@ public class Piece extends JLabel {
 		this.level = level;
 		this.name = name;
 		this.team = team;
+		specialPowerNames = null;
 		special = false;
 		isDead = false;
 		
@@ -29,7 +30,7 @@ public class Piece extends JLabel {
 		setFont(new Font("Arial", Font.BOLD, 12));
 	}
 	
-	public Piece(int level, String name, boolean team, ArrayList<Integer> specialPowerNames) {
+	public Piece(int level, String name, boolean team, ArrayList<String> specialPowerNames) {
 		this.level = level;
 		this.name = name;
 		this.team = team;
@@ -42,12 +43,12 @@ public class Piece extends JLabel {
 		setFont(new Font("Arial", Font.BOLD, 12));
 	}
 
-	public Piece(int level, String name, boolean team, int sp) {
+	public Piece(int level, String name, boolean team, String spName) {
 		this.level = level;
 		this.name = name;
 		this.team = team;
-		specialPowerNames = new ArrayList<Integer>();
-		specialPowerNames.add(sp);
+		specialPowerNames = new ArrayList<String>();
+		specialPowerNames.add(spName);
 		special = true;
 		isDead = false;
 		
@@ -64,7 +65,7 @@ public class Piece extends JLabel {
 		return special;
 	}
 
-	public ArrayList<Integer> getSpecialPowerNames() {
+	public ArrayList<String> getSpecialPowerNames() {
 		return specialPowerNames;
 	}
 

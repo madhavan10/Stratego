@@ -11,6 +11,7 @@ import java.io.PrintWriter;
 import javax.swing.BorderFactory;
 import javax.swing.JLabel;
 import javax.swing.JButton;
+import java.awt.Component;
 import java.util.ArrayList;
 import javax.swing.JPanel;
 
@@ -28,11 +29,10 @@ public class Board extends JPanel {
 		private Square selected;
 		private Square target;
 		private boolean isMyTurn;
-		private boolean usingSpecialPower;
 		private String specialPower;
 		private JLabel spMessage;
 		
-		private final SPSM sm; = new SPSM();
+		private final SPSM sm = new SPSM();
 		private final PrintWriter out;
 		private final JPanel spPanel;
 		private final JLabel eventLabel;
@@ -90,6 +90,12 @@ public class Board extends JPanel {
 			eventLabel.setText(s);
 			eventLabel.repaint();
 			eventLabel.revalidate();
+		}
+
+		public void updateSpMessage(String s) {
+			spMessage.setText(s);
+			spPanel.repaint();
+			spPanel.revalidate();
 		}
 			
 		public String toString() {
@@ -449,6 +455,25 @@ public class Board extends JPanel {
 			shadeOccupiedSquares();
 		}
 		
+		private void clearButtonsOnSpPanel() {
+			for(Component c : spPanel.getComponents())
+				if(c instanceof JButton)
+					spPanel.remove(c);
+			spPanel.repaint();
+			spPanel.revalidate();
+		}
+
+		private void addDoneButton() {
+			final JButton done = new JButton("done");
+			done.addMouseListener(new MouseAdapter() {
+				public void mouseClicked(MouseEvent e) {
+					dwarvenAxe(sm.dwarvenAxeInitialSquare, sm.dwarvenAxeMoveSquare, sm.dwarvenAxeTargets);
+					sm.setAllFalse();
+					clearButtonsOnSpPanel();
+				}
+			});
+		}
+		
 		private class SquareMotionListener extends MouseMotionAdapter {
 			@Override
 			public void mouseDragged(MouseEvent e) {
@@ -504,7 +529,7 @@ public class Board extends JPanel {
 			public void mousePressed(MouseEvent e) {
 				if(isSetupTime)
 					return;
-				if(!usingSpecialPower) {
+				if(!sm.usingSpecialPower) {
 					if(selected != null) {
 						spPanel.removeAll();
 						spPanel.repaint();
@@ -531,7 +556,7 @@ public class Board extends JPanel {
 						selected = target = null;
 						return;
 					}
-					if(!usingSpecialPower) {
+					if(!sm.usingSpecialPower) {
 						if(isValidMove(selected, target)) {
 							movePiece(selected, target);
 							selected = target = null;
@@ -548,13 +573,11 @@ public class Board extends JPanel {
 				if(isSetupTime)
 					return;
 				Square square = (Square) e.getSource();
-				if(!usingSpecialPower && square.isOccupied() && square.getOccupant().getTeam() == playerTeam) {
+				if(!sm.usingSpecialPower && square.isOccupied() && square.getOccupant().getTeam() == playerTeam) {
 					//new selection
 					if(selected != null) {
 						//remove all buttons and old border
-						spPanel.removeAll();
-						spPanel.repaint();
-						spPanel.revalidate();
+						clearButtonsOnSpPanel();
 						selected.removeSelectedBorder();
 					}
 					selected = square;
@@ -565,7 +588,7 @@ public class Board extends JPanel {
 							JButton spButton = new JButton(name);
 							spButton.addMouseListener(new MouseAdapter() {
 								public void mouseClicked(MouseEvent e) {
-									usingSpecialPower = true;
+									sm.usingSpecialPower = true;
 									specialPower = name;
 								}
 							});
@@ -574,33 +597,63 @@ public class Board extends JPanel {
 						spPanel.repaint();
 						spPanel.revalidate();
 					}
-				}
-				if(selected != null && usingSpecialPower) {
+				} 
+				else if(selected != null && sm.usingSpecialPower) {
 					spPanel.removeAll();
-					JButton cancel;
+					JButton cancel = new JButton("cancel");
 					cancel.addMouseListener(new MouseAdapter() {
 						public void mouseClicked(MouseEvent e) {
 							//remove cancel
-							spPanel.removeAll()
-							spPanel.repaint();
-							spPanel.revalidate();
+							clearButtonsOnSpPanel();
 							selected.removeSelectedBorder();
 							selected = target = null;
 						}
-					})
+					});
 					spPanel.add(cancel);
 					spPanel.repaint();
 					spPanel.revalidate();
 					if(specialPower.equals("DWARVEN_AXE")) {
-						spMessage.setText("Choose square from which to use dwarven axe");
-						spMessage.repaint();
-						spMessage.revalidate();
+						if(sm.dwarvenAxeMoveSquare != null) {
+							
+						}
+						else if(sm.dwarvenAxeInitialSquare != null) {
+							if(square == sm.dwarvenAxeInitialSquare) {
+								sm.dwarvenAxeMoveSquare = square;
+								addDoneButton();
+								updateSpMessage("Choose upto 3 targets");
+							}
+							else if(!(square.isOccupied() || square.isForbidden())) {
+								if(square.x == sm.dwarvenAxeInitialSquare.x) {
+									if(Math.abs(square.y - sm.dwarvenAxeInitialSquare.y) == 1) {
+										sm.dwarvenAxeMoveSquare = square;
+										addDoneButton();
+										updateSpMessage("Choose upto 3 targets");
+									}
+								}
+								else if(square.y == sm.dwarvenAxeInitialSquare.y) {
+									if(Math.abs(square.x - sm.dwarvenAxeInitialSquare.x) == 1) {
+										sm.dwarvenAxeMoveSquare = square;
+										addDoneButton();
+										updateSpMessage("Choose upto 3 targets");
+									}
+								}
+							}
+							else {
+								// invalid dwarven axe move sq
+							}
+						}
+						else {
+							sm.dwarvenAxeInitialSquare = square;
+							updateSpMessage("Choose square from which to dwarven axe");
+						}
 
+						
 					}
 				}
 			}
 			
 		}
+
 		
 		public static final int NO_OF_PIECES = 40;
 		public static final int BOARD_DIM = 10;
