@@ -10,6 +10,7 @@ public class SPSM {
 	Square dwarvenAxeInitialSquare = null;
 	Square dwarvenAxeMoveSquare = null;
 	Square[] dwarvenAxeTargets = new Square[3];
+	int dwarvenAxeTargetNumber = 0;
 	boolean rampage = false;
 
 	public void setAllFalse() {
@@ -19,6 +20,7 @@ public class SPSM {
 		for(Square s : dwarvenAxeTargets) {
 			s = null;
 		}
+		dwarvenAxeTargetNumber = 0;
 	}
 
 }

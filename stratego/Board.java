@@ -467,11 +467,76 @@ public class Board extends JPanel {
 			final JButton done = new JButton("done");
 			done.addMouseListener(new MouseAdapter() {
 				public void mouseClicked(MouseEvent e) {
-					dwarvenAxe(sm.dwarvenAxeInitialSquare, sm.dwarvenAxeMoveSquare, sm.dwarvenAxeTargets);
+					try {
+						dwarvenAxe(sm.dwarvenAxeInitialSquare, sm.dwarvenAxeMoveSquare, sm.dwarvenAxeTargets);
+					} catch (InterruptedException e1) {
+						// TODO Auto-generated catch block
+						e1.printStackTrace();
+					}
 					sm.setAllFalse();
 					clearButtonsOnSpPanel();
 				}
 			});
+		}
+
+		private void dwarvenAxe(Square initial, Square move, Square[] targets) throws InterruptedException {
+			System.out.println("Dwarven axe!");
+			updateEventLabel("...");
+			hideEnemyPieces();
+			if(move != initial) {
+				move.setOccupant(initial.occupant);
+				move.add(initial.occupant);
+				initial.remove(initial.occupant);
+				initial.setOccupant(null);
+			}
+
+			Piece gimli = move.occupant;
+			String result = "You captured";
+			for(Square target : targets) {
+				
+				if(gimli.clash(target.occupant) > 0 && target.occupant.level != Piece.FLAG) {
+					result += " " + target.occupant;
+					target.occupant.setVisible(true);
+					target.occupant.die();
+				}
+				else if(gimli.clash(target.occupant) < 0) {
+					if(!gimli.isDead()) {
+						gimli.die();
+						move.remove(gimli);				
+						move.setOccupant(null);
+						result = "You lost Gimli - " + result;
+					}
+				}
+				else if(gimli.clash(target.occupant) == 0) {
+					if(!gimli.isDead()) {
+						gimli.die();
+						move.remove(gimli);				
+						move.setOccupant(null);
+						result = "You lost Gimli - " + result;
+					}
+					result += " " + target.occupant;
+					target.occupant.setVisible(true);
+					target.occupant.die();
+				}
+				else {
+					// Piece = flag
+					target.occupant.setVisible(true);
+				}
+			}
+			updateEventLabel(result);
+			repaint();
+			revalidate();
+			//so see results
+			//there may be better way
+			Thread.sleep(9000);
+			for(Square target : targets) {
+				if(target.occupant.isDead()) {
+					target.remove(target.occupant);
+					target.setOccupant(null);
+				}
+			}
+			shadeOccupiedSquares();
+			sm.setAllFalse();
 		}
 		
 		private class SquareMotionListener extends MouseMotionAdapter {
@@ -613,36 +678,35 @@ public class Board extends JPanel {
 					spPanel.repaint();
 					spPanel.revalidate();
 					if(specialPower.equals("DWARVEN_AXE")) {
-						if(sm.dwarvenAxeMoveSquare != null) {
+						if(sm.dwarvenAxeMoveSquare != null && sm.dwarvenAxeTargetNumber <= 3) {
+							System.out.println("Choosing a target");
+							if(square.isOccupied() && square.isWithinAxeRange(sm.dwarvenAxeMoveSquare)) {
+								boolean alreadyInTargets = false;
+								for(Square s : sm.dwarvenAxeTargets) {
+									if(square == s) {
+										alreadyInTargets = true;
+										break;
+									}
+								} 
+								if(!alreadyInTargets) {
+									square.setTargetBorder();
+									sm.dwarvenAxeTargets[sm.dwarvenAxeTargetNumber] = square;
+									sm.dwarvenAxeTargetNumber++;
+								}
+							}
+						}
+						else if(sm.dwarvenAxeInitialSquare != null &&
+							(square == sm.dwarvenAxeInitialSquare ||
+								(!(square.isOccupied() || square.isForbidden()) && 
+									square.isAdjacent(sm.dwarvenAxeInitialSquare)))) {
+							System.out.println("Choose targets");
+							sm.dwarvenAxeMoveSquare = square;	
+							addDoneButton();
+							updateSpMessage("Choose upto 3 targets");
 							
 						}
-						else if(sm.dwarvenAxeInitialSquare != null) {
-							if(square == sm.dwarvenAxeInitialSquare) {
-								sm.dwarvenAxeMoveSquare = square;
-								addDoneButton();
-								updateSpMessage("Choose upto 3 targets");
-							}
-							else if(!(square.isOccupied() || square.isForbidden())) {
-								if(square.x == sm.dwarvenAxeInitialSquare.x) {
-									if(Math.abs(square.y - sm.dwarvenAxeInitialSquare.y) == 1) {
-										sm.dwarvenAxeMoveSquare = square;
-										addDoneButton();
-										updateSpMessage("Choose upto 3 targets");
-									}
-								}
-								else if(square.y == sm.dwarvenAxeInitialSquare.y) {
-									if(Math.abs(square.x - sm.dwarvenAxeInitialSquare.x) == 1) {
-										sm.dwarvenAxeMoveSquare = square;
-										addDoneButton();
-										updateSpMessage("Choose upto 3 targets");
-									}
-								}
-							}
-							else {
-								// invalid dwarven axe move sq
-							}
-						}
 						else {
+							System.out.println("Choose dw move sq");
 							sm.dwarvenAxeInitialSquare = square;
 							updateSpMessage("Choose square from which to dwarven axe");
 						}

@@ -42,14 +42,38 @@ public class Square extends JPanel {
 		else
 			isOccupied = true;
 	}
+
+	public boolean isWithinAxeRange(Square other) {
+		if(this.isAdjacent(other))
+			return true;
+		if(Math.abs(this.x - other.x) == 1 && Math.abs(this.y - other.y) == 1)
+			return true;
+		return false;
+
+	}
+
+	public boolean isAdjacent(Square other) {
+		if(this.x == other.x)
+			if(Math.abs(this.y - other.y) == 1)
+				return true;
+		if(this.y == other.y)
+			if(Math.abs(this.x - other.x) == 1)
+				return true;
+		return false;
+	}
 	
 	public void setLastMoveBorder() {
-		setBorder(BorderFactory.createLineBorder(Color.green));
+		setBorder(BorderFactory.createLineBorder(Color.green, 2));
 		repaint();
 	}
 	
 	public void setSelectedBorder() {
 		setBorder(BorderFactory.createLineBorder(Color.red));
+		repaint();
+	}
+
+	public void setTargetBorder() {
+		setBorder(BorderFactory.createLineBorder(Color.blue));
 		repaint();
 	}
 	
