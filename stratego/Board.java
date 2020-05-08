@@ -653,6 +653,7 @@ public class Board extends JPanel {
 							JButton spButton = new JButton(name);
 							spButton.addMouseListener(new MouseAdapter() {
 								public void mouseClicked(MouseEvent e) {
+									System.out.println("Using " + name);
 									sm.usingSpecialPower = true;
 									specialPower = name;
 								}
