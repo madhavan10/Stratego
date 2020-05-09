@@ -78,7 +78,6 @@ public class Stratego extends JFrame {
 		setTitle("Stratego");
 		setSize(768, 768);
 		
-		messagePanel = new JPanel();
 		messageLabel = new JLabel("...");
 		messageLabel.setHorizontalAlignment(SwingConstants.LEFT);
 		messageLabel.setFont(new Font("Arial", Font.PLAIN, 16));
@@ -87,20 +86,22 @@ public class Stratego extends JFrame {
 		eventLabel.setFont(new Font("Arial", Font.PLAIN, 16));
 		eventLabel.setHorizontalAlignment(SwingConstants.RIGHT);
 		
+		messagePanel = new JPanel();
+		messagePanel.add(messageLabel);
+		messagePanel.add(eventLabel);
+		
 		spPanel = new JPanel();
 		
 		auxPanel = new JPanel();
+		auxPanel.setLayout(new BorderLayout());
+		auxPanel.add(spPanel, BorderLayout.NORTH);
+		auxPanel.add(messagePanel, BorderLayout.SOUTH);
+		
 		board = new Board(out, spPanel, eventLabel);
 		
 		Container contentPane = getContentPane();
 		contentPane.add(board, BorderLayout.CENTER);
 		contentPane.add(auxPanel, BorderLayout.SOUTH);
-		
-		auxPanel.setLayout(new BorderLayout());
-		auxPanel.add(spPanel, BorderLayout.NORTH);
-		auxPanel.add(messagePanel, BorderLayout.SOUTH);
-		messagePanel.add(messageLabel);
-		messagePanel.add(eventLabel);
 	}
 	
 	protected void play() {
@@ -168,7 +169,7 @@ public class Stratego extends JFrame {
 			} else if(response.equals("MOVE_OK")) {
 				if(!board.isSetupTime()) {
 					board.setIsMyTurn(false);
-					messageLabel.setText("Opponent's turn");
+					messageLabel.setText("Opponent's turn | ");
 					messagePanel.repaint();
 					messagePanel.revalidate();
 				}
@@ -181,13 +182,14 @@ public class Stratego extends JFrame {
 				board.moveOpponentPiece(x1, y1, x2, y2);
 				if(!board.isSetupTime()) {
 					board.setIsMyTurn(true);
-					messageLabel.setText("Your turn");
+					messageLabel.setText("Your turn | ");
 					messagePanel.repaint();
 					messagePanel.revalidate();
 				}
 			} else if(response.startsWith("OPPONENT_DWARVEN_AXE")) {
 				Scanner scan = new Scanner(response.substring(21));
 				String daMove = scan.next();
+				scan.close();
 				int x1 = Integer.parseInt(daMove.substring(0, 1));
 				int y1 = Integer.parseInt(daMove.substring(1, 2));
 				int x2 = Integer.parseInt(daMove.substring(2, 3));
@@ -203,7 +205,7 @@ public class Stratego extends JFrame {
 				}
 				board.opponentDwarvenAxe(x1, y1, x2, y2, targets);
 				board.setIsMyTurn(true);
-				messageLabel.setText("Your turn");
+				messageLabel.setText("Your turn | ");
 				messagePanel.repaint();
 				messagePanel.revalidate();
 				

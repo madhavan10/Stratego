@@ -6,7 +6,6 @@ public class SPSM {
 	boolean detectEnemy = false;
 	boolean longbow = false;
 	boolean swiftSteed = false;
-	boolean dwarvenAxe = false;
 	Square dwarvenAxeInitialSquare = null;
 	Square dwarvenAxeMoveSquare = null;
 	Square[] dwarvenAxeTargets = new Square[3];
@@ -15,7 +14,7 @@ public class SPSM {
 
 	public void setAllFalse() {
 		usingSpecialPower = false;
-		flight = detectEnemy = longbow = swiftSteed = dwarvenAxe = rampage = false;
+		flight = detectEnemy = longbow = swiftSteed = rampage = false;
 		dwarvenAxeInitialSquare = dwarvenAxeMoveSquare = null;
 		for(int i = 0; i < dwarvenAxeTargets.length; i++)
 			dwarvenAxeTargets[i] = null;

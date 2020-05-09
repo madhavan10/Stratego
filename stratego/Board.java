@@ -496,7 +496,7 @@ public class Board extends JPanel {
 			for(Square target : targets) {
 				if(target != null) {
 					if(gimli.clash(target.occupant) > 0 && target.occupant.level != Piece.FLAG) {
-						result += " " + target.occupant;
+						result += ", " + target.occupant;
 						target.occupant.die();
 					}
 					else if(gimli.clash(target.occupant) < 0) {
@@ -514,7 +514,7 @@ public class Board extends JPanel {
 							move.setOccupant(null);
 							result = "You lost Gimli - " + result;
 						}
-						result += " " + target.occupant;
+						result += ", " + target.occupant;
 						target.occupant.die();
 					}
 					target.occupant.setVisible(true);
@@ -555,12 +555,12 @@ public class Board extends JPanel {
 				initial.setOccupant(null);
 			}
 			Piece gimli = move.occupant;
-			String result = "Gimli used Dwarven axe - You lost ";
+			String result = "Gimli used Dwarven axe: You lost ";
 			for(Square target : targets) {
 				if(target != null) {
 					target.setLastMoveBorder();
 					if(gimli.clash(target.occupant) > 0 && target.occupant.level != Piece.FLAG) {
-						result += " " + target.occupant;
+						result += ", " + target.occupant;
 						target.remove(target.occupant);
 						target.setOccupant(null);
 					}
@@ -580,7 +580,7 @@ public class Board extends JPanel {
 							result = "Opponent lost Gimli - " + result;
 							
 						}
-						result += " " + target.occupant;
+						result += ", " + target.occupant;
 						target.remove(target.occupant);
 						target.setOccupant(null);
 					}
@@ -655,18 +655,20 @@ public class Board extends JPanel {
 				//System.out.println("Mouse Dragged!");
 				if(!gameStarted)
 					return;
+				if(sm.usingSpecialPower) {
+					return;
+				}
+				
 				Square square = (Square) e.getSource();
-				if(!sm.usingSpecialPower) {
-					if(square.isOccupied() && square.getOccupant().getTeam() == playerTeam) {
-						if(selected != null) 
-							selected.removeSelectedBorder();
-						selected = square;
-					}
-					else {
-						if(selected != null) {
-							selected.removeSelectedBorder();
-							selected = null;
-						}
+				if(square.isOccupied() && square.getOccupant().getTeam() == playerTeam) {
+					if(selected != null) 
+						selected.removeSelectedBorder();
+					selected = square;
+				}
+				else {
+					if(selected != null) {
+						selected.removeSelectedBorder();
+						selected = null;
 					}
 				}
 			}
@@ -759,6 +761,8 @@ public class Board extends JPanel {
 			public void mouseClicked(MouseEvent e) {
 				if(isSetupTime)
 					return;
+				if(!isMyTurn)
+					return;
 				Square square = (Square) e.getSource();
 				if(!sm.usingSpecialPower && square.isOccupied() && square.getOccupant().getTeam() == playerTeam) {
 					//new selection
@@ -781,7 +785,7 @@ public class Board extends JPanel {
 					if(specialPower.equals("DWARVEN_AXE")) {
 						if(sm.dwarvenAxeMoveSquare != null && sm.dwarvenAxeTargetNumber <= 3) {
 							System.out.println("Choosing a target");
-							if(square.isOccupied() && square.isWithinAxeRange(sm.dwarvenAxeMoveSquare)) {
+							if(square.isOccupied() && square.occupant.team != playerTeam && square.isWithinAxeRange(sm.dwarvenAxeMoveSquare)) {
 								boolean alreadyInTargets = false;
 								for(Square s : sm.dwarvenAxeTargets) {
 									if(square == s) {
