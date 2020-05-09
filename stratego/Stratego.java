@@ -185,8 +185,8 @@ public class Stratego extends JFrame {
 					messagePanel.repaint();
 					messagePanel.revalidate();
 				}
-			} else if(response.startsWith("DWARVEN_AXE")) {
-				Scanner scan = new Scanner(response.substring(12));
+			} else if(response.startsWith("OPPONENT_DWARVEN_AXE")) {
+				Scanner scan = new Scanner(response.substring(21));
 				String daMove = scan.next();
 				int x1 = Integer.parseInt(daMove.substring(0, 1));
 				int y1 = Integer.parseInt(daMove.substring(1, 2));
@@ -202,6 +202,7 @@ public class Stratego extends JFrame {
 					i++;
 				}
 				board.opponentDwarvenAxe(x1, y1, x2, y2, targets);
+				board.setIsMyTurn(true);
 				messageLabel.setText("Your turn");
 				messagePanel.repaint();
 				messagePanel.revalidate();

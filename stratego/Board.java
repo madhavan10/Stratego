@@ -25,6 +25,7 @@ public class Board extends JPanel {
 		
 		private boolean isSetupTime;
 		private boolean playerTeam;
+		private boolean gameStarted;
 		
 		private Square selected;
 		private Square target;
@@ -47,6 +48,7 @@ public class Board extends JPanel {
 			createSquares();
 			createPieces();
 			setPieces();
+			gameStarted = false;
 			isSetupTime = true;
 			selected = null;
 		}
@@ -69,7 +71,7 @@ public class Board extends JPanel {
 		
 		public void setTeam(boolean team) {
 			playerTeam = team;
-			
+			gameStarted = true;
 			for (Piece piece : whitePieces)
 				if(piece.getTeam() != playerTeam) 
 					piece.setVisible(false);
@@ -302,13 +304,14 @@ public class Board extends JPanel {
 			square2.remove(square2.getOccupant());
 			square2.setOccupant(tmp);
 			square2.add(tmp);
-			selected = target = null;
 			repaint();
 			revalidate();
 			out.println("MOVE " + square1.x + "" + square1.y + "" + square2.x + "" + square2.y);
 		}
 		
 		private boolean isValidMove(Square square1, Square square2) {
+			//debug
+			//System.out.println("square1 occupant: " + square1.getOccupant());
 			int level1 = square1.getOccupant().getLevel();
 			if(level1 == Piece.FLAG || level1 == Piece.STRONGHOLD)
 				return false;
@@ -393,7 +396,6 @@ public class Board extends JPanel {
 				}
 			}
 			shadeOccupiedSquares();
-			selected = target = null;
 			out.println("MOVE " + square1.x + "" + square1.y + "" + square2.x + "" + square2.y);
 			if(flag)
 				out.println("FLAG");
@@ -471,6 +473,7 @@ public class Board extends JPanel {
 					sm.setAllFalse();
 					updateSpMessage("...");
 					clearButtonsOnSpPanel();
+					selected = target = null;
 				}
 			});
 			spPanel.add(done);
@@ -534,7 +537,6 @@ public class Board extends JPanel {
 					
 				}
 			}
-			isMyTurn = false;
 			out.println(moveStr);
 			shadeOccupiedSquares();
 			sm.setAllFalse();
@@ -546,13 +548,113 @@ public class Board extends JPanel {
 			refreshBorders();
 			Square initial = board[x1][y1];
 			Square move = board[x2][y2];
+			if(move != initial) {
+				move.setOccupant(initial.occupant);
+				move.add(initial.occupant);
+				initial.remove(initial.occupant);
+				initial.setOccupant(null);
+			}
+			Piece gimli = move.occupant;
+			String result = "Gimli used Dwarven axe - You lost ";
+			for(Square target : targets) {
+				if(target != null) {
+					target.setLastMoveBorder();
+					if(gimli.clash(target.occupant) > 0 && target.occupant.level != Piece.FLAG) {
+						result += " " + target.occupant;
+						target.remove(target.occupant);
+						target.setOccupant(null);
+					}
+					else if(gimli.clash(target.occupant) < 0) {
+						if(!gimli.isDead()) {
+							gimli.die();
+							move.remove(gimli);				
+							move.setOccupant(null);
+							result = "Opponent lost Gimli - " + result;
+						}
+					}
+					else if(gimli.clash(target.occupant) == 0) {
+						if(!gimli.isDead()) {
+							gimli.die();
+							move.remove(gimli);				
+							move.setOccupant(null);
+							result = "Opponent lost Gimli - " + result;
+							
+						}
+						result += " " + target.occupant;
+						target.remove(target.occupant);
+						target.setOccupant(null);
+					}
+				}
+			}
+			gimli.setVisible(true);
+			updateEventLabel(result);
+			shadeOccupiedSquares();			
+		}
+		
+		private boolean cancelAlreadyExists() {
+			for(Component c : spPanel.getComponents()) {
+				if(c instanceof JButton) {
+					JButton button = (JButton) c;
+					if(button.getText().equalsIgnoreCase("cancel"))
+						return true;
+				}
+			}
+			return false;
+		}
+
+		private void addSpButton(String text) {
+			JButton spButton = new JButton(text);
+			spButton.addMouseListener(new MouseAdapter() {
+				public void mouseClicked(MouseEvent e) {
+					specialPower = ((JButton) e.getSource()).getText();
+					System.out.println("Using " + specialPower);
+					sm.usingSpecialPower = true;
+					if(specialPower.equals("DWARVEN_AXE")) {
+						sm.dwarvenAxeInitialSquare = selected; 
+						updateSpMessage("Choose square from which to dwarven axe");
+					}
+					clearButtonsOnSpPanel();
+					if(!cancelAlreadyExists()) {
+						addCancelButton();
+					}
+				}
+			});
+			spPanel.add(spButton);
+			spPanel.repaint();
+			spPanel.revalidate();			
+		}
+		
+		private void addCancelButton() {
+			JButton cancel = new JButton("cancel");
+			cancel.addMouseListener(new MouseAdapter() {
+				public void mouseClicked(MouseEvent e) {
+					//remove cancel
+					updateSpMessage("...");
+					clearButtonsOnSpPanel();
+					if(sm.dwarvenAxeMoveSquare != null)
+						sm.dwarvenAxeMoveSquare.removeSelectedBorder();
+					for(Square daTarget : sm.dwarvenAxeTargets) {
+						if(daTarget != null)
+							daTarget.removeSelectedBorder();
+					}
+					//debug
+					//System.out.println("selected " + selected);
+					selected.removeSelectedBorder();
+					sm.setAllFalse();
+					selected = target = null;
+				}
+			});
+			spPanel.add(cancel);
+			spPanel.repaint();
+			spPanel.revalidate();
 		}
 		
 		private class SquareMotionListener extends MouseMotionAdapter {
 			@Override
 			public void mouseDragged(MouseEvent e) {
 				//System.out.println("Mouse Dragged!");
-			
+				if(!gameStarted)
+					return;
 				Square square = (Square) e.getSource();
 				if(square.isOccupied() && square.getOccupant().getTeam() == playerTeam) {
 					if(selected != null) 
@@ -588,12 +690,16 @@ public class Board extends JPanel {
 						target = null;
 				else
 					//not setup time
-					if(square.isOccupied())
+					if(square.isOccupied()) {
+						//debug
+						//System.out.println("square occupant: "  + square.getOccupant());
+						//System.out.println("Selected occupant " + selected.getOccupant());
 						if(square.getOccupant().getTeam() != selected.getOccupant().getTeam())
 							target = square;
 						else
 							//same team
 							target = null;
+					}
 					else
 						//target is empty square
 						target = square;
@@ -634,7 +740,6 @@ public class Board extends JPanel {
 						if(isValidMove(selected, target)) {
 							movePiece(selected, target);
 							selected = target = null;
-							isMyTurn = false;
 						}
 						else
 							selected = target = null;
@@ -659,49 +764,12 @@ public class Board extends JPanel {
 					if(square.getOccupant().isSpecial()) {
 						//add buttons for special power(s)
 						for(String name : square.getOccupant().getSpecialPowerNames()) {
-							JButton spButton = new JButton(name);
-							spButton.addMouseListener(new MouseAdapter() {
-								public void mouseClicked(MouseEvent e) {
-									String spName = ((JButton) e.getSource()).getText();
-									System.out.println("Using " + spName);
-									sm.usingSpecialPower = true;
-									specialPower = spName;
-									if(specialPower.equals("DWARVEN_AXE")) {
-										sm.dwarvenAxeInitialSquare = selected; 
-										updateSpMessage("Choose square from which to dwarven axe");
-										clearButtonsOnSpPanel();
-									}
-								}
-							});
-							spPanel.add(spButton);
+							addSpButton(name);
 						}
-						spPanel.repaint();
-						spPanel.revalidate();
 					}
 				} 
 				else if(selected != null && sm.usingSpecialPower) {
-					if(!cancelAlreadyExists()) {
-						JButton cancel = new JButton("cancel");
-						cancel.addMouseListener(new MouseAdapter() {
-							public void mouseClicked(MouseEvent e) {
-								//remove cancel
-								updateSpMessage("...");
-								clearButtonsOnSpPanel();
-								if(sm.dwarvenAxeMoveSquare != null)
-									sm.dwarvenAxeMoveSquare.removeSelectedBorder();
-								for(Square daTarget : sm.dwarvenAxeTargets) {
-									if(daTarget != null)
-										daTarget.removeSelectedBorder();
-								}
-								selected.removeSelectedBorder();
-								sm.setAllFalse();
-								selected = target = null;
-							}
-						});
-						spPanel.add(cancel);
-						spPanel.repaint();
-						spPanel.revalidate();
-					}
+					
 					if(specialPower.equals("DWARVEN_AXE")) {
 						if(sm.dwarvenAxeMoveSquare != null && sm.dwarvenAxeTargetNumber <= 3) {
 							System.out.println("Choosing a target");
@@ -743,15 +811,6 @@ public class Board extends JPanel {
 		public static final boolean ORC = false;
 		public static final boolean HUMAN = true;
 
-		public boolean cancelAlreadyExists() {
-			for(Component c : spPanel.getComponents()) {
-				if(c instanceof JButton) {
-					JButton button = (JButton) c;
-					if(button.getText().equalsIgnoreCase("cancel"))
-						return true;
-				}
-			}
-			return false;
-		}
+		
 	
 	} //end class

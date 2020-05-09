@@ -22,7 +22,7 @@ public class Game {
 		isSetupTime = true;
 	}
 	
-	public synchronized void move(int x1, int y1, int x2, int y2, Player player) {
+	public synchronized void move(Player player) {
 		if(isSetupTime)
 			return;
 		if(player != currentPlayer) {
@@ -70,17 +70,27 @@ public class Game {
 			while(input.hasNextLine()) {
 				//System.out.println("Process commands loop head");
 				String command = input.nextLine();
+				System.out.println(command);
 				if(command.startsWith("MOVE")) {
-					System.out.println(command);
 					String command2 = command.substring(5, 9);
+					/*
 					int x1 = Integer.parseInt(command2.substring(0, 1));
 					int y1 = Integer.parseInt(command2.substring(1, 2));
 					int x2 = Integer.parseInt(command2.substring(2, 3));
 					int y2 = Integer.parseInt(command2.substring(3, 4));
+					*/
 					try {
-						move(x1, y1, x2, y2, this);
+						move(this);
 						output.println("MOVE_OK");
 						opponent.output.println("OPPONENT_MOVED " + command2);
+					} catch(IllegalStateException e) {
+						output.println(e.getMessage());
+					}
+				} else if(command.startsWith("DWARVEN_AXE")) {
+					try {
+						move(this);
+						output.println("MOVE_OK");
+						opponent.output.println("OPPONENT_DWARVEN_AXE " + command.substring(12));
 					} catch(IllegalStateException e) {
 						output.println(e.getMessage());
 					}
