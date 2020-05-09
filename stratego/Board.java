@@ -638,7 +638,7 @@ public class Board extends JPanel {
 							daTarget.removeSelectedBorder();
 					}
 					//debug
-					//System.out.println("selected " + selected);
+					System.out.println("selected " + selected);
 					selected.removeSelectedBorder();
 					sm.setAllFalse();
 					selected = target = null;
@@ -656,15 +656,18 @@ public class Board extends JPanel {
 				if(!gameStarted)
 					return;
 				Square square = (Square) e.getSource();
-				if(square.isOccupied() && square.getOccupant().getTeam() == playerTeam) {
-					if(selected != null) 
-						selected.removeSelectedBorder();
-					selected = square;
-				}
-				else {
-					if(selected != null) 
-						selected.removeSelectedBorder();
-					selected = null;
+				if(!sm.usingSpecialPower) {
+					if(square.isOccupied() && square.getOccupant().getTeam() == playerTeam) {
+						if(selected != null) 
+							selected.removeSelectedBorder();
+						selected = square;
+					}
+					else {
+						if(selected != null) {
+							selected.removeSelectedBorder();
+							selected = null;
+						}
+					}
 				}
 			}
 		}
@@ -723,13 +726,15 @@ public class Board extends JPanel {
 			@Override
 			public void mouseReleased(MouseEvent e) {
 				//System.out.println("Mouse Released!");
-				if(target == null) {
-					selected = null;
-					return;
-				}
+				
 				if(isSetupTime) {
-					swapPieces(selected, target);
-					selected = target = null;
+					if(target == null) {
+						selected = null;
+					}
+					else {
+						swapPieces(selected, target);
+						selected = target = null;
+					}
 				}
 				else {
 					if(!isMyTurn) {
@@ -737,7 +742,10 @@ public class Board extends JPanel {
 						return;
 					}
 					if(!sm.usingSpecialPower) {
-						if(isValidMove(selected, target)) {
+						if(target == null) {
+							selected = null;
+						}
+						else if(isValidMove(selected, target)) {
 							movePiece(selected, target);
 							selected = target = null;
 						}

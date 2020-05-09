@@ -72,17 +72,10 @@ public class Game {
 				String command = input.nextLine();
 				System.out.println(command);
 				if(command.startsWith("MOVE")) {
-					String command2 = command.substring(5, 9);
-					/*
-					int x1 = Integer.parseInt(command2.substring(0, 1));
-					int y1 = Integer.parseInt(command2.substring(1, 2));
-					int x2 = Integer.parseInt(command2.substring(2, 3));
-					int y2 = Integer.parseInt(command2.substring(3, 4));
-					*/
 					try {
 						move(this);
 						output.println("MOVE_OK");
-						opponent.output.println("OPPONENT_MOVED " + command2);
+						opponent.output.println("OPPONENT_MOVED " + command.substring(5, 9));
 					} catch(IllegalStateException e) {
 						output.println(e.getMessage());
 					}
