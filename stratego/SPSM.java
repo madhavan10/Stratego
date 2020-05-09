@@ -17,9 +17,8 @@ public class SPSM {
 		usingSpecialPower = false;
 		flight = detectEnemy = longbow = swiftSteed = dwarvenAxe = rampage = false;
 		dwarvenAxeInitialSquare = dwarvenAxeMoveSquare = null;
-		for(Square s : dwarvenAxeTargets) {
-			s = null;
-		}
+		for(int i = 0; i < dwarvenAxeTargets.length; i++)
+			dwarvenAxeTargets[i] = null;
 		dwarvenAxeTargetNumber = 0;
 	}
 

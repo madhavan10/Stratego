@@ -185,6 +185,27 @@ public class Stratego extends JFrame {
 					messagePanel.repaint();
 					messagePanel.revalidate();
 				}
+			} else if(response.startsWith("DWARVEN_AXE")) {
+				Scanner scan = new Scanner(response.substring(12));
+				String daMove = scan.next();
+				int x1 = Integer.parseInt(daMove.substring(0, 1));
+				int y1 = Integer.parseInt(daMove.substring(1, 2));
+				int x2 = Integer.parseInt(daMove.substring(2, 3));
+				int y2 = Integer.parseInt(daMove.substring(3, 4));
+				int i = 0;
+				Square[] targets = new Square[3];
+				while(scan.hasNext()) {
+					String targetStr = scan.next();
+					int x = Integer.parseInt(targetStr.substring(0, 1));
+					int y = Integer.parseInt(targetStr.substring(1, 2));
+					targets[i] = board.getBoard()[x][y];
+					i++;
+				}
+				board.opponentDwarvenAxe(x1, y1, x2, y2, targets);
+				messageLabel.setText("Your turn");
+				messagePanel.repaint();
+				messagePanel.revalidate();
+				
 			} else if(response.equals("OTHER_PLAYER_LEFT")) {
 				JOptionPane.showMessageDialog(this, "Other player left");
 				break;

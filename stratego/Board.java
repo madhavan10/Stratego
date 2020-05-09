@@ -467,20 +467,18 @@ public class Board extends JPanel {
 			final JButton done = new JButton("done");
 			done.addMouseListener(new MouseAdapter() {
 				public void mouseClicked(MouseEvent e) {
-					try {
-						dwarvenAxe(sm.dwarvenAxeInitialSquare, sm.dwarvenAxeMoveSquare, sm.dwarvenAxeTargets);
-					} catch (InterruptedException e1) {
-						// TODO Auto-generated catch block
-						e1.printStackTrace();
-					}
+					dwarvenAxe(sm.dwarvenAxeInitialSquare, sm.dwarvenAxeMoveSquare, sm.dwarvenAxeTargets);
 					sm.setAllFalse();
+					updateSpMessage("...");
 					clearButtonsOnSpPanel();
 				}
 			});
+			spPanel.add(done);
+			spPanel.repaint();
+			spPanel.revalidate();
 		}
 
-		private void dwarvenAxe(Square initial, Square move, Square[] targets) throws InterruptedException {
-			System.out.println("Dwarven axe!");
+		private void dwarvenAxe(Square initial, Square move, Square[] targets) {
 			updateEventLabel("...");
 			hideEnemyPieces();
 			if(move != initial) {
@@ -493,50 +491,61 @@ public class Board extends JPanel {
 			Piece gimli = move.occupant;
 			String result = "You captured";
 			for(Square target : targets) {
-				
-				if(gimli.clash(target.occupant) > 0 && target.occupant.level != Piece.FLAG) {
-					result += " " + target.occupant;
-					target.occupant.setVisible(true);
-					target.occupant.die();
-				}
-				else if(gimli.clash(target.occupant) < 0) {
-					if(!gimli.isDead()) {
-						gimli.die();
-						move.remove(gimli);				
-						move.setOccupant(null);
-						result = "You lost Gimli - " + result;
+				if(target != null) {
+					if(gimli.clash(target.occupant) > 0 && target.occupant.level != Piece.FLAG) {
+						result += " " + target.occupant;
+						target.occupant.die();
 					}
-				}
-				else if(gimli.clash(target.occupant) == 0) {
-					if(!gimli.isDead()) {
-						gimli.die();
-						move.remove(gimli);				
-						move.setOccupant(null);
-						result = "You lost Gimli - " + result;
+					else if(gimli.clash(target.occupant) < 0) {
+						if(!gimli.isDead()) {
+							gimli.die();
+							move.remove(gimli);				
+							move.setOccupant(null);
+							result = "You lost Gimli - " + result;
+						}
 					}
-					result += " " + target.occupant;
-					target.occupant.setVisible(true);
-					target.occupant.die();
-				}
-				else {
-					// Piece = flag
+					else if(gimli.clash(target.occupant) == 0) {
+						if(!gimli.isDead()) {
+							gimli.die();
+							move.remove(gimli);				
+							move.setOccupant(null);
+							result = "You lost Gimli - " + result;
+						}
+						result += " " + target.occupant;
+						target.occupant.die();
+					}
 					target.occupant.setVisible(true);
 				}
 			}
+
 			updateEventLabel(result);
 			repaint();
 			revalidate();
-			//so see results
-			//there may be better way
-			Thread.sleep(9000);
+			move.removeSelectedBorder();
+			String moveStr = "DWARVEN_AXE " + initial.x + "" + initial.y + "" + move.x + "" + move.y;
 			for(Square target : targets) {
-				if(target.occupant.isDead()) {
-					target.remove(target.occupant);
-					target.setOccupant(null);
+				if(target != null) {
+					moveStr += " " + target.x + "" + target.y;
+					if(target.occupant.isDead()) {
+						target.remove(target.occupant);
+						target.setOccupant(null);
+					}
+					target.removeSelectedBorder();
+					
 				}
 			}
+			isMyTurn = false;
+			out.println(moveStr);
 			shadeOccupiedSquares();
 			sm.setAllFalse();
+			selected.removeSelectedBorder();
+			
+		}
+		
+		public void opponentDwarvenAxe(int x1, int y1, int x2, int y2, Square[] targets) {
+			refreshBorders();
+			Square initial = board[x1][y1];
+			Square move = board[x2][y2];
 		}
 		
 		private class SquareMotionListener extends MouseMotionAdapter {
@@ -596,7 +605,7 @@ public class Board extends JPanel {
 					return;
 				if(!sm.usingSpecialPower) {
 					if(selected != null) {
-						spPanel.removeAll();
+						clearButtonsOnSpPanel();
 						spPanel.repaint();
 						spPanel.revalidate();
 						selected.removeSelectedBorder();
@@ -653,9 +662,15 @@ public class Board extends JPanel {
 							JButton spButton = new JButton(name);
 							spButton.addMouseListener(new MouseAdapter() {
 								public void mouseClicked(MouseEvent e) {
-									System.out.println("Using " + name);
+									String spName = ((JButton) e.getSource()).getText();
+									System.out.println("Using " + spName);
 									sm.usingSpecialPower = true;
-									specialPower = name;
+									specialPower = spName;
+									if(specialPower.equals("DWARVEN_AXE")) {
+										sm.dwarvenAxeInitialSquare = selected; 
+										updateSpMessage("Choose square from which to dwarven axe");
+										clearButtonsOnSpPanel();
+									}
 								}
 							});
 							spPanel.add(spButton);
@@ -665,19 +680,28 @@ public class Board extends JPanel {
 					}
 				} 
 				else if(selected != null && sm.usingSpecialPower) {
-					spPanel.removeAll();
-					JButton cancel = new JButton("cancel");
-					cancel.addMouseListener(new MouseAdapter() {
-						public void mouseClicked(MouseEvent e) {
-							//remove cancel
-							clearButtonsOnSpPanel();
-							selected.removeSelectedBorder();
-							selected = target = null;
-						}
-					});
-					spPanel.add(cancel);
-					spPanel.repaint();
-					spPanel.revalidate();
+					if(!cancelAlreadyExists()) {
+						JButton cancel = new JButton("cancel");
+						cancel.addMouseListener(new MouseAdapter() {
+							public void mouseClicked(MouseEvent e) {
+								//remove cancel
+								updateSpMessage("...");
+								clearButtonsOnSpPanel();
+								if(sm.dwarvenAxeMoveSquare != null)
+									sm.dwarvenAxeMoveSquare.removeSelectedBorder();
+								for(Square daTarget : sm.dwarvenAxeTargets) {
+									if(daTarget != null)
+										daTarget.removeSelectedBorder();
+								}
+								selected.removeSelectedBorder();
+								sm.setAllFalse();
+								selected = target = null;
+							}
+						});
+						spPanel.add(cancel);
+						spPanel.repaint();
+						spPanel.revalidate();
+					}
 					if(specialPower.equals("DWARVEN_AXE")) {
 						if(sm.dwarvenAxeMoveSquare != null && sm.dwarvenAxeTargetNumber <= 3) {
 							System.out.println("Choosing a target");
@@ -703,16 +727,10 @@ public class Board extends JPanel {
 							System.out.println("Choose targets");
 							sm.dwarvenAxeMoveSquare = square;	
 							addDoneButton();
+							square.setTargetBorder();
 							updateSpMessage("Choose upto 3 targets");
 							
 						}
-						else {
-							System.out.println("Choose dw move sq");
-							sm.dwarvenAxeInitialSquare = square;
-							updateSpMessage("Choose square from which to dwarven axe");
-						}
-
-						
 					}
 				}
 			}
@@ -724,5 +742,16 @@ public class Board extends JPanel {
 		public static final int BOARD_DIM = 10;
 		public static final boolean ORC = false;
 		public static final boolean HUMAN = true;
+
+		public boolean cancelAlreadyExists() {
+			for(Component c : spPanel.getComponents()) {
+				if(c instanceof JButton) {
+					JButton button = (JButton) c;
+					if(button.getText().equalsIgnoreCase("cancel"))
+						return true;
+				}
+			}
+			return false;
+		}
 	
 	} //end class
