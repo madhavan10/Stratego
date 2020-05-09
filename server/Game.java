@@ -95,6 +95,10 @@ public class Game {
 					move(this);
 					output.println("MOVE_OK");
 					opponent.output.println("OPPONENT_DETECT " + command.substring(7, 11));
+				} else if(command.startsWith("LONGBOW")) {
+					move(this);
+					output.println("MOVE_OK");
+					opponent.output.println("OPPONENT_LONGBOW " + command.substring(8, 12));
 				} else if(command.equals("FLAG")) {
 					output.println("VICTORY");
 					opponent.output.println("DEFEAT");

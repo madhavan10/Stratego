@@ -93,7 +93,7 @@ public class Piece extends JLabel {
 		if(level == SPY)
 			return "Spy";
 		if(special)
-			return name;
+			return name + "(" + level + ")";
 		return "" + level;
 	}
 

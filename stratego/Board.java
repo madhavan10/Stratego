@@ -172,10 +172,10 @@ public class Board extends JPanel {
 			whitePieces[i] = new Piece(6, "Arwen", HUMAN); i++;		
 			whitePieces[i] = new Piece(6, "Treebeard", HUMAN); i++;		
 			whitePieces[i] = new Piece(6, "Boromir", HUMAN); i++;		
-			whitePieces[i] = new Piece(5, "Elf-1", HUMAN, "LONGBOW"); i++;		
-			whitePieces[i] = new Piece(5, "Elf-2", HUMAN, "LONGBOW"); i++;		
-			whitePieces[i] = new Piece(5, "Elf-3", HUMAN, "LONGBOW"); i++;		
-			whitePieces[i] = new Piece(5, "Elf-4", HUMAN, "LONGBOW"); i++;		
+			whitePieces[i] = new Piece(5, "Elf", HUMAN, "LONGBOW"); i++;		
+			whitePieces[i] = new Piece(5, "Elf", HUMAN, "LONGBOW"); i++;		
+			whitePieces[i] = new Piece(5, "Elf", HUMAN, "LONGBOW"); i++;		
+			whitePieces[i] = new Piece(5, "Elf", HUMAN, "LONGBOW"); i++;		
 			whitePieces[i] = new Piece(4, "Merry", HUMAN); i++;		
 			whitePieces[i] = new Piece(4, "Pippin", HUMAN); i++;		
 			whitePieces[i] = new Piece(4, "Frodo", HUMAN); i++;		
@@ -214,14 +214,14 @@ public class Board extends JPanel {
 			blackPieces[j] = new Piece(6, "Uruk-2", ORC); j++;
 			blackPieces[j] = new Piece(6, "Uruk-3", ORC); j++;
 			blackPieces[j] = new Piece(6, "Uruk-4", ORC); j++;
-			blackPieces[j] = new Piece(5, "Beserker-1", ORC, "RAMPAGE"); j++;
-			blackPieces[j] = new Piece(5, "Beserker-2", ORC, "RAMPAGE"); j++;
-			blackPieces[j] = new Piece(5, "Beserker-3", ORC, "RAMPAGE"); j++;
-			blackPieces[j] = new Piece(5, "Beserker-4", ORC, "RAMPAGE"); j++;
-			blackPieces[j] = new Piece(4, "Haradrim-1", ORC, "LONGBOW"); j++;
-			blackPieces[j] = new Piece(4, "Haradrim-2", ORC, "LONGBOW"); j++;
-			blackPieces[j] = new Piece(4, "Haradrim-3", ORC, "LONGBOW"); j++;
-			blackPieces[j] = new Piece(4, "Haradrim-4", ORC, "LONGBOW"); j++;
+			blackPieces[j] = new Piece(5, "Beserker", ORC, "RAMPAGE"); j++;
+			blackPieces[j] = new Piece(5, "Beserker", ORC, "RAMPAGE"); j++;
+			blackPieces[j] = new Piece(5, "Beserker", ORC, "RAMPAGE"); j++;
+			blackPieces[j] = new Piece(5, "Beserker", ORC, "RAMPAGE"); j++;
+			blackPieces[j] = new Piece(4, "Haradrim", ORC, "LONGBOW"); j++;
+			blackPieces[j] = new Piece(4, "Haradrim", ORC, "LONGBOW"); j++;
+			blackPieces[j] = new Piece(4, "Haradrim", ORC, "LONGBOW"); j++;
+			blackPieces[j] = new Piece(4, "Haradrim", ORC, "LONGBOW"); j++;
 			blackPieces[j] = new Piece(3, "Orc-1", ORC); j++;
 			blackPieces[j] = new Piece(3, "Orc-2", ORC); j++;
 			blackPieces[j] = new Piece(3, "Orc-3", ORC); j++;
@@ -508,15 +508,15 @@ public class Board extends JPanel {
 			String result = "You lost " + berserker + " - You captured";
 			ArrayList<Square> targets = getRampageTargets(move);
 				
-			for(Square target: targets) {
+			for(Square targeted: targets) {
 				move.remove(berserker);
 				move.setOccupant(null);
-				target.occupant.setVisible(true);				
-				if((target.occupant.level == Piece.STRONGHOLD || berserker.clash(target.occupant) >= 0) 
-						&& target.occupant.level != Piece.FLAG) {
-					result += ", " + target.occupant;
-					target.remove(target.occupant);
-					target.setOccupant(null);
+				targeted.occupant.setVisible(true);				
+				if((targeted.occupant.level == Piece.STRONGHOLD || berserker.clash(targeted.occupant) >= 0) 
+						&& targeted.occupant.level != Piece.FLAG) {
+					result += ", " + targeted.occupant;
+					targeted.remove(targeted.occupant);
+					targeted.setOccupant(null);
 				}
 
 			}
@@ -544,13 +544,13 @@ public class Board extends JPanel {
 			ArrayList<Square> targets = getRampageTargets(move);
 			move.remove(berserker);
 			move.setOccupant(null);
-			for(Square target: targets) {
-				target.setLastMoveBorder();
-				if((target.occupant.level == Piece.STRONGHOLD || berserker.clash(target.occupant) >= 0) 
-						&& target.occupant.level != Piece.FLAG) {
-					result += ", " + target.occupant;
-					target.remove(target.occupant);
-					target.setOccupant(null);
+			for(Square targeted: targets) {
+				targeted.setLastMoveBorder();
+				if((targeted.occupant.level == Piece.STRONGHOLD || berserker.clash(targeted.occupant) >= 0) 
+						&& targeted.occupant.level != Piece.FLAG) {
+					result += ", " + targeted.occupant;
+					targeted.remove(targeted.occupant);
+					targeted.setOccupant(null);
 				}				
 			}
 			updateEventLabel(result);
@@ -669,41 +669,79 @@ public class Board extends JPanel {
 			shadeOccupiedSquares();
 		}
 		
-		private boolean isValidDetect(Square src, Square target) {
-			if(target.isOccupied && target.occupant.team != playerTeam) {
-				if(src.isWithinAxeRange(target))
+		private boolean isValidDetect(Square src, Square dest) {
+			if(dest.isOccupied && dest.occupant.team != playerTeam) {
+				if(src.isWithinAxeRange(dest))
 					return true;
-				else if(src.x == target.x) {
-					if(Math.abs(src.y - target.y) == 2)
+				else if(src.x == dest.x) {
+					if(Math.abs(src.y - dest.y) == 2)
 						return true;
 				}
-				else if(src.y == target.y) {
-					if(Math.abs(src.x - target.x) == 2)
+				else if(src.y == dest.y) {
+					if(Math.abs(src.x - dest.x) == 2)
 						return true;
 				}
 			}
 			return false;
 		}
 		
-		private void detect(Square src, Square target) {
+		private void longbow(Square src, Square dest) {
 			hideEnemyPieces();
-			target.occupant.setVisible(true);
+			Piece archer = src.occupant;
+			Piece other = dest.occupant;
+			if(archer.clash(other) > 0 && !(other.level == Piece.FLAG || (other.level == 5 && other.team == ORC))) {
+				updateEventLabel("You captured " + other);
+				dest.remove(other);
+				dest.setOccupant(null);
+			}
+			else {
+				updateEventLabel("Longbow rendered ineffective");
+			}
+			shadeOccupiedSquares();
+			sm.setAllFalse();
+			selected.removeSelectedBorder();
+			out.println("LONGBOW " + src.x + "" + src.y + "" + dest.x + "" + dest.y);
+		}
+		
+		public void opponentLongbow(int x1, int y1, int x2, int y2) {
+			Square src = board[x1][y1];
+			Square dest = board[x2][y2];
+			refreshBorders();
+			Piece archer = src.occupant;
+			Piece other = dest.occupant;
+			src.setLastMoveBorder();
+			dest.setLastMoveBorder();
+			archer.setVisible(true);
+			if(archer.clash(other) > 0 && !(other.level == Piece.FLAG || (other.level == 5 && other.team == ORC))) {
+				updateEventLabel(archer + " used longbow: You lost " + other);
+				dest.remove(other);
+				dest.setOccupant(null);
+			}
+			else {
+				updateEventLabel(archer + " used longbow on " + other + " ineffectively");	
+			}
+			shadeOccupiedSquares();
+		}
+		
+		private void detect(Square src, Square dest) {
+			hideEnemyPieces();
+			dest.occupant.setVisible(true);
 			sm.setAllFalse();
 			selected.removeSelectedBorder();
 			repaint();
 			revalidate();
-			out.println("DETECT " + src.x + "" + src.y + "" + target.x + "" + target.y);
+			out.println("DETECT " + src.x + "" + src.y + "" + dest.x + "" + dest.y);
 		}
 		
 		public void opponentDetect(int x1, int y1, int x2, int y2) {
 			Square src = board[x1][y1];
-			Square target = board[x2][y2];
+			Square dest = board[x2][y2];
 			refreshBorders();
 			Piece nine = src.occupant;
 			nine.setVisible(true);
 			src.setLastMoveBorder();
-			target.setLastMoveBorder();
-			updateEventLabel(nine + " used detect enemy on " + target.occupant);
+			dest.setLastMoveBorder();
+			updateEventLabel(nine + " used detect enemy on " + dest.occupant);
 		}
 		
 		private void flight(Square initial, Square dest) {
@@ -785,13 +823,13 @@ public class Board extends JPanel {
 
 			Piece gimli = move.occupant;
 			String result = "You captured";
-			for(Square target : targets) {
-				if(target != null) {
-					if(gimli.clash(target.occupant) > 0 && target.occupant.level != Piece.FLAG) {
-						result += ", " + target.occupant;
-						target.occupant.die();
+			for(Square targeted : targets) {
+				if(targeted != null) {
+					if(gimli.clash(targeted.occupant) > 0 && targeted.occupant.level != Piece.FLAG) {
+						result += ", " + targeted.occupant;
+						targeted.occupant.die();
 					}
-					else if(gimli.clash(target.occupant) < 0) {
+					else if(gimli.clash(targeted.occupant) < 0) {
 						if(!gimli.isDead()) {
 							gimli.die();
 							move.remove(gimli);				
@@ -799,17 +837,17 @@ public class Board extends JPanel {
 							result = "You lost Gimli - " + result;
 						}
 					}
-					else if(gimli.clash(target.occupant) == 0) {
+					else if(gimli.clash(targeted.occupant) == 0) {
 						if(!gimli.isDead()) {
 							gimli.die();
 							move.remove(gimli);				
 							move.setOccupant(null);
 							result = "You lost Gimli - " + result;
 						}
-						result += ", " + target.occupant;
-						target.occupant.die();
+						result += ", " + targeted.occupant;
+						targeted.occupant.die();
 					}
-					target.occupant.setVisible(true);
+					targeted.occupant.setVisible(true);
 				}
 			}
 
@@ -818,14 +856,14 @@ public class Board extends JPanel {
 			revalidate();
 			move.removeSelectedBorder();
 			String moveStr = "DWARVEN_AXE " + initial.x + "" + initial.y + "" + move.x + "" + move.y;
-			for(Square target : targets) {
-				if(target != null) {
-					moveStr += " " + target.x + "" + target.y;
-					if(target.occupant.isDead()) {
-						target.remove(target.occupant);
-						target.setOccupant(null);
+			for(Square targeted : targets) {
+				if(targeted != null) {
+					moveStr += " " + targeted.x + "" + targeted.y;
+					if(targeted.occupant.isDead()) {
+						targeted.remove(targeted.occupant);
+						targeted.setOccupant(null);
 					}
-					target.removeSelectedBorder();
+					targeted.removeSelectedBorder();
 					
 				}
 			}
@@ -849,15 +887,15 @@ public class Board extends JPanel {
 			}
 			Piece gimli = move.occupant;
 			String result = "Gimli used Dwarven axe: You lost ";
-			for(Square target : targets) {
-				if(target != null) {
-					target.setLastMoveBorder();
-					if(gimli.clash(target.occupant) > 0 && target.occupant.level != Piece.FLAG) {
-						result += ", " + target.occupant;
-						target.remove(target.occupant);
-						target.setOccupant(null);
+			for(Square targeted : targets) {
+				if(targeted != null) {
+					targeted.setLastMoveBorder();
+					if(gimli.clash(targeted.occupant) > 0 && targeted.occupant.level != Piece.FLAG) {
+						result += ", " + targeted.occupant;
+						targeted.remove(targeted.occupant);
+						targeted.setOccupant(null);
 					}
-					else if(gimli.clash(target.occupant) < 0) {
+					else if(gimli.clash(targeted.occupant) < 0) {
 						if(!gimli.isDead()) {
 							gimli.die();
 							move.remove(gimli);				
@@ -865,7 +903,7 @@ public class Board extends JPanel {
 							result = "Opponent lost Gimli - " + result;
 						}
 					}
-					else if(gimli.clash(target.occupant) == 0) {
+					else if(gimli.clash(targeted.occupant) == 0) {
 						if(!gimli.isDead()) {
 							gimli.die();
 							move.remove(gimli);				
@@ -873,9 +911,9 @@ public class Board extends JPanel {
 							result = "Opponent lost Gimli - " + result;
 							
 						}
-						result += ", " + target.occupant;
-						target.remove(target.occupant);
-						target.setOccupant(null);
+						result += ", " + targeted.occupant;
+						targeted.remove(targeted.occupant);
+						targeted.setOccupant(null);
 					}
 				}
 			}
@@ -922,6 +960,10 @@ public class Board extends JPanel {
 					else if(specialPower.equals("DETECT_ENEMY")) {
 						sm.detectEnemy = true;
 						updateSpMessage("Choose target");
+					}
+					else if(specialPower.equals("LONGBOW")) {
+						sm.longbow = true;
+						updateSpMessage("Choose longbow target");
 					}
 					clearButtonsOnSpPanel();
 					if(!cancelAlreadyExists()) {
@@ -1156,6 +1198,14 @@ public class Board extends JPanel {
 							selected = target = null;
 						}
 					}
+					else if(specialPower.equals("LONGBOW")) {
+						if(sm.longbow && isValidDetect(selected, square)) {
+							longbow(selected, square);
+							updateSpMessage("...");
+							clearButtonsOnSpPanel();
+							selected = target = null;
+						}
+					}
 				}
 			}
 			
@@ -1165,6 +1215,5 @@ public class Board extends JPanel {
 		public static final int BOARD_DIM = 10;
 		public static final boolean ORC = false;
 		public static final boolean HUMAN = true;
-
 		
 	} //end class

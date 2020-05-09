@@ -229,6 +229,16 @@ public class Stratego extends JFrame {
 				int y2 = Integer.parseInt(moveStr.substring(3, 4));
 				board.opponentDetect(x1, y1, x2, y2);
 				board.setIsMyTurn(true);
+				updateMessageLabel("Your turn | ");
+			} else if(response.startsWith("OPPONENT_LONGBOW")) {
+				String moveStr = response.substring(17, 21);
+				int x1 = Integer.parseInt(moveStr.substring(0, 1));
+				int y1 = Integer.parseInt(moveStr.substring(1, 2));
+				int x2 = Integer.parseInt(moveStr.substring(2, 3));
+				int y2 = Integer.parseInt(moveStr.substring(3, 4));
+				board.opponentLongbow(x1, y1, x2, y2);
+				board.setIsMyTurn(true);
+				updateMessageLabel("Your turn | ");
 			} else if(response.equals("OTHER_PLAYER_LEFT")) {
 				JOptionPane.showMessageDialog(this, "Other player left");
 				break;
