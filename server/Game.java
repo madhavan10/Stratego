@@ -87,6 +87,14 @@ public class Game {
 					} catch(IllegalStateException e) {
 						output.println(e.getMessage());
 					}
+				} else if(command.startsWith("RAMPAGE")) {
+					try {
+						move(this);
+						output.println("MOVE_OK");
+						opponent.output.println("OPPONENT_RAMPAGE " + command.substring(8, 12));
+					} catch (IllegalStateException e) {
+						output.println(e.getMessage());
+					}
 				} else if(command.equals("FLAG")) {
 					output.println("VICTORY");
 					opponent.output.println("DEFEAT");

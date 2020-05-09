@@ -139,11 +139,7 @@ public class Stratego extends JFrame {
 				
 				//System.out.println("end of choose team");
 			} else if(response.startsWith("MESSAGE")) {
-				
-				
-				messageLabel.setText(response);
-				messagePanel.repaint();
-				messagePanel.revalidate();
+				updateMessageLabel(response);
 			} else if(response.startsWith("YOUR_TEAM")) {
 				boolean team = Boolean.parseBoolean(response.substring(10));
 				board.setTeam(team);
@@ -151,27 +147,20 @@ public class Stratego extends JFrame {
 				setTitle("Stratego " + teamAsStr);
 			} else if(response.startsWith("SETUP") && !response.equals("SETUP_TIME_OVER")) {
 				int setupTime = Integer.parseInt(response.substring(6));
-				messageLabel.setText(setupTime + " minutes to setup");
-				messagePanel.repaint();
-				messagePanel.revalidate();
+				updateMessageLabel(setupTime + " minutes to setup");
 			} else if(response.equals("SETUP_TIME_OVER")) {
 				board.setupTimeOver();
 				if(board.getPlayerTeam() == Board.ORC) {
-					messageLabel.setText("You start");
+					updateMessageLabel("You start");
 					board.setIsMyTurn(true);
 				} else {
-					messageLabel.setText("Opponent to play");
+					updateMessageLabel("Opponent to play");
 					board.setIsMyTurn(false);
 				}
-				
-				messagePanel.repaint();
-				messagePanel.revalidate();
 			} else if(response.equals("MOVE_OK")) {
 				if(!board.isSetupTime()) {
 					board.setIsMyTurn(false);
-					messageLabel.setText("Opponent's turn | ");
-					messagePanel.repaint();
-					messagePanel.revalidate();
+					updateMessageLabel("Opponent's turn | ");
 				}
 			} else if(response.startsWith("OPPONENT_MOVED")) {
 				String moveStr = response.substring(15, 19);
@@ -182,14 +171,11 @@ public class Stratego extends JFrame {
 				board.moveOpponentPiece(x1, y1, x2, y2);
 				if(!board.isSetupTime()) {
 					board.setIsMyTurn(true);
-					messageLabel.setText("Your turn | ");
-					messagePanel.repaint();
-					messagePanel.revalidate();
+					updateMessageLabel("Your turn | ");
 				}
 			} else if(response.startsWith("OPPONENT_DWARVEN_AXE")) {
 				Scanner scan = new Scanner(response.substring(21));
 				String daMove = scan.next();
-				scan.close();
 				int x1 = Integer.parseInt(daMove.substring(0, 1));
 				int y1 = Integer.parseInt(daMove.substring(1, 2));
 				int x2 = Integer.parseInt(daMove.substring(2, 3));
@@ -203,12 +189,19 @@ public class Stratego extends JFrame {
 					targets[i] = board.getBoard()[x][y];
 					i++;
 				}
+				scan.close();
 				board.opponentDwarvenAxe(x1, y1, x2, y2, targets);
 				board.setIsMyTurn(true);
-				messageLabel.setText("Your turn | ");
-				messagePanel.repaint();
-				messagePanel.revalidate();
-				
+				updateMessageLabel("Your turn | ");;		
+			} else if(response.startsWith("OPPONENT_RAMPAGE")) {
+				String moveStr = response.substring(17, 21);
+				int x1 = Integer.parseInt(moveStr.substring(0, 1));
+				int y1 = Integer.parseInt(moveStr.substring(1, 2));
+				int x2 = Integer.parseInt(moveStr.substring(2, 3));
+				int y2 = Integer.parseInt(moveStr.substring(3, 4));
+				board.opponentRampage(x1, y1, x2, y2);
+				board.setIsMyTurn(true);
+				updateMessageLabel("Your turn | ");
 			} else if(response.equals("OTHER_PLAYER_LEFT")) {
 				JOptionPane.showMessageDialog(this, "Other player left");
 				break;
@@ -220,6 +213,12 @@ public class Stratego extends JFrame {
 				break;
 			}
 		}	
+	}
+	
+	private void updateMessageLabel(String message) {
+		messageLabel.setText(message);
+		messagePanel.repaint();
+		messagePanel.revalidate();
 	}
 	
 }

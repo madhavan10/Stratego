@@ -470,7 +470,6 @@ public class Board extends JPanel {
 			done.addMouseListener(new MouseAdapter() {
 				public void mouseClicked(MouseEvent e) {
 					dwarvenAxe(sm.dwarvenAxeInitialSquare, sm.dwarvenAxeMoveSquare, sm.dwarvenAxeTargets);
-					sm.setAllFalse();
 					updateSpMessage("...");
 					clearButtonsOnSpPanel();
 					selected = target = null;
@@ -479,6 +478,78 @@ public class Board extends JPanel {
 			spPanel.add(done);
 			spPanel.repaint();
 			spPanel.revalidate();
+		}
+		
+		private ArrayList<Square> getRampageTargets(Square square) {
+			ArrayList<Square> targets = new ArrayList<Square>();
+			for(int j = 0; j < BOARD_DIM; j++) {
+				for(int i = 0; i < BOARD_DIM; i++) {
+					if(board[i][j].isWithinAxeRange(square)	&& board[i][j].isOccupied 
+							&& board[i][j].occupant.team != square.occupant.team) {
+						targets.add(board[i][j]);
+					}
+				}
+			}
+			return targets;
+		}
+		private void rampage(Square initial, Square move) {
+			updateEventLabel("...");
+			hideEnemyPieces();
+			if(move != initial) {
+				move.setOccupant(initial.occupant);
+				move.add(initial.occupant);
+				initial.remove(initial.occupant);
+				initial.setOccupant(null);
+			}
+			Piece berserker = move.occupant;
+			String result = "You lost " + berserker + " - You captured";
+			ArrayList<Square> targets = getRampageTargets(move);
+				
+			for(Square target: targets) {
+				move.remove(berserker);
+				move.setOccupant(null);
+				target.occupant.setVisible(true);				
+				if(berserker.clash(target.occupant) >= 0 && target.occupant.level != Piece.FLAG) {
+					result += ", " + target.occupant;
+					target.remove(target.occupant);
+					target.setOccupant(null);
+				}
+
+			}
+			updateEventLabel(result);
+			out.println("RAMPAGE " + initial.x + "" + initial.y + "" + move.x + "" + move.y);
+			shadeOccupiedSquares();
+			selected.removeSelectedBorder();
+			sm.setAllFalse();			
+		}
+		
+		public void opponentRampage(int x1, int y1, int x2, int y2) {
+			refreshBorders();
+			Square initial = board[x1][y1];
+			Square move = board[x2][y2];
+			if(move != initial) {
+				move.setOccupant(initial.occupant);
+				move.add(initial.occupant);
+				initial.remove(initial.occupant);
+				initial.setOccupant(null);
+			}
+			move.setLastMoveBorder();
+			Piece berserker = move.occupant;
+			
+			String result =  berserker + " used rampage: You lost";
+			ArrayList<Square> targets = getRampageTargets(move);
+			move.remove(berserker);
+			move.setOccupant(null);
+			for(Square target: targets) {
+				target.setLastMoveBorder();
+				if(berserker.clash(target.occupant) >= 0 && target.occupant.level != Piece.FLAG) {
+					result += ", " + target.occupant;
+					target.remove(target.occupant);
+					target.setOccupant(null);
+				}				
+			}
+			updateEventLabel(result);
+			shadeOccupiedSquares();
 		}
 
 		private void dwarvenAxe(Square initial, Square move, Square[] targets) {
@@ -548,6 +619,7 @@ public class Board extends JPanel {
 			refreshBorders();
 			Square initial = board[x1][y1];
 			Square move = board[x2][y2];
+			move.setLastMoveBorder();
 			if(move != initial) {
 				move.setOccupant(initial.occupant);
 				move.add(initial.occupant);
@@ -607,11 +679,16 @@ public class Board extends JPanel {
 			spButton.addMouseListener(new MouseAdapter() {
 				public void mouseClicked(MouseEvent e) {
 					specialPower = ((JButton) e.getSource()).getText();
+					//debug
 					System.out.println("Using " + specialPower);
 					sm.usingSpecialPower = true;
 					if(specialPower.equals("DWARVEN_AXE")) {
 						sm.dwarvenAxeInitialSquare = selected; 
 						updateSpMessage("Choose square from which to dwarven axe");
+					}
+					else if(specialPower.equals("RAMPAGE")) {
+						sm.rampageInitialSquare = selected;
+						updateSpMessage("Choose square from which to use rampage");
 					}
 					clearButtonsOnSpPanel();
 					if(!cancelAlreadyExists()) {
@@ -696,9 +773,6 @@ public class Board extends JPanel {
 				else
 					//not setup time
 					if(square.isOccupied()) {
-						//debug
-						//System.out.println("square occupant: "  + square.getOccupant());
-						//System.out.println("Selected occupant " + selected.getOccupant());
 						if(square.getOccupant().getTeam() != selected.getOccupant().getTeam())
 							target = square;
 						else
@@ -727,8 +801,6 @@ public class Board extends JPanel {
 			
 			@Override
 			public void mouseReleased(MouseEvent e) {
-				//System.out.println("Mouse Released!");
-				
 				if(isSetupTime) {
 					if(target == null) {
 						selected = null;
@@ -784,6 +856,7 @@ public class Board extends JPanel {
 					
 					if(specialPower.equals("DWARVEN_AXE")) {
 						if(sm.dwarvenAxeMoveSquare != null && sm.dwarvenAxeTargetNumber <= 3) {
+							//debug
 							System.out.println("Choosing a target");
 							if(square.isOccupied() && square.occupant.team != playerTeam && square.isWithinAxeRange(sm.dwarvenAxeMoveSquare)) {
 								boolean alreadyInTargets = false;
@@ -801,9 +874,10 @@ public class Board extends JPanel {
 							}
 						}
 						else if(sm.dwarvenAxeInitialSquare != null &&
-							(square == sm.dwarvenAxeInitialSquare ||
+								(square == sm.dwarvenAxeInitialSquare ||
 								(!(square.isOccupied() || square.isForbidden()) && 
-									square.isAdjacent(sm.dwarvenAxeInitialSquare)))) {
+										square.isAdjacent(sm.dwarvenAxeInitialSquare)))) {
+							//debug
 							System.out.println("Choose targets");
 							sm.dwarvenAxeMoveSquare = square;	
 							addDoneButton();
@@ -812,17 +886,27 @@ public class Board extends JPanel {
 							
 						}
 					}
+					else if(specialPower.equals("RAMPAGE")) {
+						if(sm.rampageInitialSquare != null &&
+								(square == sm.rampageInitialSquare ||
+								(!(square.isOccupied || square.isForbidden) &&
+										square.isAdjacent(sm.rampageInitialSquare)))) {
+							sm.rampageMoveSquare = square;
+							rampage(sm.rampageInitialSquare, sm.rampageMoveSquare);
+							updateSpMessage("...");
+							clearButtonsOnSpPanel();
+							selected = target = null;
+						}
+								
+					}
 				}
 			}
 			
 		}
-
 		
 		public static final int NO_OF_PIECES = 40;
 		public static final int BOARD_DIM = 10;
 		public static final boolean ORC = false;
 		public static final boolean HUMAN = true;
-
-		
 	
 	} //end class
