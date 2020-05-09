@@ -91,6 +91,10 @@ public class Game {
 					move(this);
 					output.println("MOVE_OK");
 					opponent.output.println("OPPONENT_SWIFT_STEED " + command.substring(12, 16));
+				} else if(command.startsWith("DETECT")) {
+					move(this);
+					output.println("MOVE_OK");
+					opponent.output.println("OPPONENT_DETECT " + command.substring(7, 11));
 				} else if(command.equals("FLAG")) {
 					output.println("VICTORY");
 					opponent.output.println("DEFEAT");

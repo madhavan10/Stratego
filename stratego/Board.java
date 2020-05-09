@@ -595,6 +595,7 @@ public class Board extends JPanel {
 		}
 		
 		private void swiftSteed(Square src, Square dest) {
+			hideEnemyPieces();
 			Piece theoden = src.occupant;
 			if(!dest.isOccupied) {
 				dest.add(theoden);
@@ -668,7 +669,45 @@ public class Board extends JPanel {
 			shadeOccupiedSquares();
 		}
 		
+		private boolean isValidDetect(Square src, Square target) {
+			if(target.isOccupied && target.occupant.team != playerTeam) {
+				if(src.isWithinAxeRange(target))
+					return true;
+				else if(src.x == target.x) {
+					if(Math.abs(src.y - target.y) == 2)
+						return true;
+				}
+				else if(src.y == target.y) {
+					if(Math.abs(src.x - target.x) == 2)
+						return true;
+				}
+			}
+			return false;
+		}
+		
+		private void detect(Square src, Square target) {
+			hideEnemyPieces();
+			target.occupant.setVisible(true);
+			sm.setAllFalse();
+			selected.removeSelectedBorder();
+			repaint();
+			revalidate();
+			out.println("DETECT " + src.x + "" + src.y + "" + target.x + "" + target.y);
+		}
+		
+		public void opponentDetect(int x1, int y1, int x2, int y2) {
+			Square src = board[x1][y1];
+			Square target = board[x2][y2];
+			refreshBorders();
+			Piece nine = src.occupant;
+			nine.setVisible(true);
+			src.setLastMoveBorder();
+			target.setLastMoveBorder();
+			updateEventLabel(nine + " used detect enemy on " + target.occupant);
+		}
+		
 		private void flight(Square initial, Square dest) {
+			hideEnemyPieces();
 			Piece ten = initial.occupant;
 			dest.add(ten);
 			dest.setOccupant(ten);
@@ -879,6 +918,10 @@ public class Board extends JPanel {
 					else if(specialPower.equals("SWIFT_STEED")) {
 						sm.swiftSteed = true;
 						updateSpMessage("Choose destination");
+					}
+					else if(specialPower.equals("DETECT_ENEMY")) {
+						sm.detectEnemy = true;
+						updateSpMessage("Choose target");
 					}
 					clearButtonsOnSpPanel();
 					if(!cancelAlreadyExists()) {
@@ -1105,6 +1148,14 @@ public class Board extends JPanel {
 							selected = target = null;
 						}
 					}
+					else if(specialPower.equals("DETECT_ENEMY")) {
+						if(sm.detectEnemy && isValidDetect(selected, square)) {
+							detect(selected, square);
+							updateSpMessage("...");
+							clearButtonsOnSpPanel();
+							selected = target = null;
+						}
+					}
 				}
 			}
 			
@@ -1115,7 +1166,5 @@ public class Board extends JPanel {
 		public static final boolean ORC = false;
 		public static final boolean HUMAN = true;
 
-
-
-	
+		
 	} //end class
