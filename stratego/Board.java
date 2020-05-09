@@ -71,7 +71,6 @@ public class Board extends JPanel {
 		
 		public void setTeam(boolean team) {
 			playerTeam = team;
-			gameStarted = true;
 			for (Piece piece : whitePieces)
 				if(piece.getTeam() != playerTeam) 
 					piece.setVisible(false);
@@ -82,6 +81,10 @@ public class Board extends JPanel {
 			
 			repaint();
 			revalidate();
+		}
+		
+		public void setGameStarted(boolean b) {
+			gameStarted = true;	
 		}
 		
 		public void setupTimeOver() {
@@ -469,7 +472,7 @@ public class Board extends JPanel {
 			final JButton done = new JButton("done");
 			done.addMouseListener(new MouseAdapter() {
 				public void mouseClicked(MouseEvent e) {
-					dwarvenAxe(sm.dwarvenAxeInitialSquare, sm.dwarvenAxeMoveSquare, sm.dwarvenAxeTargets);
+					dwarvenAxe(sm.dwarvenAxeInitial, sm.dwarvenAxeMove, sm.dwarvenAxeTargets);
 					updateSpMessage("...");
 					clearButtonsOnSpPanel();
 					selected = target = null;
@@ -509,7 +512,8 @@ public class Board extends JPanel {
 				move.remove(berserker);
 				move.setOccupant(null);
 				target.occupant.setVisible(true);				
-				if(berserker.clash(target.occupant) >= 0 && target.occupant.level != Piece.FLAG) {
+				if((target.occupant.level == Piece.STRONGHOLD || berserker.clash(target.occupant) >= 0) 
+						&& target.occupant.level != Piece.FLAG) {
 					result += ", " + target.occupant;
 					target.remove(target.occupant);
 					target.setOccupant(null);
@@ -536,13 +540,14 @@ public class Board extends JPanel {
 			move.setLastMoveBorder();
 			Piece berserker = move.occupant;
 			
-			String result =  berserker + " used rampage: You lost";
+			String result = berserker + " used rampage: You lost";
 			ArrayList<Square> targets = getRampageTargets(move);
 			move.remove(berserker);
 			move.setOccupant(null);
 			for(Square target: targets) {
 				target.setLastMoveBorder();
-				if(berserker.clash(target.occupant) >= 0 && target.occupant.level != Piece.FLAG) {
+				if((target.occupant.level == Piece.STRONGHOLD || berserker.clash(target.occupant) >= 0) 
+						&& target.occupant.level != Piece.FLAG) {
 					result += ", " + target.occupant;
 					target.remove(target.occupant);
 					target.setOccupant(null);
@@ -551,7 +556,184 @@ public class Board extends JPanel {
 			updateEventLabel(result);
 			shadeOccupiedSquares();
 		}
-
+		
+		private boolean isValidSwiftSteed(Square src, Square dest) {
+			if(!dest.isForbidden && (!dest.isOccupied || dest.occupant.team != playerTeam)) {
+				if(src.x == dest.x) {
+					if(Math.abs(src.y - dest.y) == 2) {
+						if(src.y < dest.y) {
+							if(board[src.x][src.y + 1].isOccupied)
+								return false;
+							return true;
+						}
+						else if(src.y > dest.y) {
+							if(board[src.x][src.y - 1].isOccupied)
+								return false;
+							return true;
+						}
+					}
+					return false;
+				}
+				else if(src.y == dest.y) {
+					if(Math.abs(src.x - dest.x) == 2) {
+						if(src.x < dest.x) {
+							if(board[src.x + 1][src.y].isOccupied)
+								return false;
+							return true;
+						}
+						else if(src.x > dest.x) {
+							if(board[src.x - 1][src.y].isOccupied)
+								return false;
+							return true;
+						}
+					}
+					return false;
+				}
+				return false;
+			}
+			return false;
+		}
+		
+		private void swiftSteed(Square src, Square dest) {
+			Piece theoden = src.occupant;
+			if(!dest.isOccupied) {
+				dest.add(theoden);
+				dest.setOccupant(theoden);
+				src.remove(theoden);
+				src.setOccupant(null);
+			}
+			else if(theoden.clash(dest.occupant) > 0) {
+				updateEventLabel("You captured " + dest.occupant);
+				dest.remove(dest.occupant);
+				dest.add(theoden);
+				dest.setOccupant(theoden);
+				src.remove(theoden);
+				src.setOccupant(null);	
+			}
+			else if(theoden.clash(dest.occupant) == 0) {
+				updateEventLabel("Tie with " + dest.occupant);
+				dest.remove(dest.occupant);
+				dest.setOccupant(null);
+				src.remove(theoden);
+				src.setOccupant(null);
+			}
+			else {
+				//theoden dies
+				updateEventLabel("You lost " + theoden);
+				src.remove(theoden);
+				src.setOccupant(null);
+			}
+			shadeOccupiedSquares();
+			sm.setAllFalse();
+			out.println("SWIFT_STEED " + src.x + "" + src.y + "" + dest.x + "" + dest.y);
+			selected.removeSelectedBorder();
+		}
+		
+		public void opponentSwiftSteed(int x1, int y1, int x2, int y2) {
+			refreshBorders();
+			Square src = board[x1][y1];
+			Square dest = board[x2][y2];
+			Piece theoden = src.occupant;
+			theoden.setVisible(true);
+			dest.setLastMoveBorder();
+			String result = theoden + " used Swift Steed:";
+			if(!dest.isOccupied) {
+				dest.add(theoden);
+				dest.setOccupant(theoden);
+				src.remove(theoden);
+				src.setOccupant(null);
+			}
+			else if(theoden.clash(dest.occupant) > 0) {
+				result += " You lost " + dest.occupant;
+				dest.remove(dest.occupant);
+				dest.add(theoden);
+				dest.setOccupant(theoden);
+				src.remove(theoden);
+				src.setOccupant(null);	
+			}
+			else if(theoden.clash(dest.occupant) == 0) {
+				result += " Tie with " + dest.occupant;
+				dest.remove(dest.occupant);
+				dest.setOccupant(null);
+				src.remove(theoden);
+				src.setOccupant(null);
+			}
+			else {
+				//theoden dies
+				result += " You captured " + theoden;
+				src.remove(theoden);
+				src.setOccupant(null);
+			}
+			updateEventLabel(result);
+			shadeOccupiedSquares();
+		}
+		
+		private void flight(Square initial, Square dest) {
+			Piece ten = initial.occupant;
+			dest.add(ten);
+			dest.setOccupant(ten);
+			initial.remove(ten);
+			initial.setOccupant(null);
+			shadeOccupiedSquares();
+			out.println("FLIGHT " + initial.x + "" + initial.y + "" + dest.x + "" + dest.y);
+			sm.setAllFalse();
+			selected.removeSelectedBorder();		
+		}
+		
+		public void opponentFlight(int x1, int y1, int x2, int y2) {
+			refreshBorders();
+			Square initial = board[x1][y1];
+			Square dest = board[x2][y2];
+			Piece ten = initial.occupant;
+			dest.add(ten);
+			dest.setLastMoveBorder();
+			dest.setOccupant(ten);
+			initial.remove(ten);
+			initial.setOccupant(null);
+			ten.setVisible(true);
+			shadeOccupiedSquares();
+			updateEventLabel(ten + " used Flight");
+		}
+		
+		private boolean isValidFlight(Square initial, Square dest) {
+			if(!dest.isOccupied) {
+				if(dest.x == initial.x) {
+					if(dest.y > initial.y) {
+						for(int i = initial.y + 1; i < dest.y; i++) {
+							if(!(board[dest.x][i].isForbidden || board[dest.x][i].isOccupied))
+								return false;
+						}
+						return true;
+					}
+					else if(dest.y < initial.y) {
+						for(int i = initial.y; i > dest.y; i--) {
+							if(!(board[dest.x][i].isForbidden || board[dest.x][i].isOccupied))
+								return false;
+						}
+						return true;
+					}
+				}
+				else if(dest.y == initial.y) {
+					if(dest.x > initial.x) {
+						for(int i = initial.x; i < dest.x; i++) {
+							if(!(board[i][dest.y].isForbidden || board[i][dest.y].isOccupied))
+								return false;
+						}
+						return true;
+					}
+					else if(dest.x < initial.x) {
+						for(int i = initial.x; i > dest.x; i--) {
+							if(!(board[i][dest.y].isForbidden || board[i][dest.y].isOccupied))
+								return false;
+						}
+						return true;
+					}
+				}
+				return false;
+			}
+			return false;
+		}
+		
 		private void dwarvenAxe(Square initial, Square move, Square[] targets) {
 			updateEventLabel("...");
 			hideEnemyPieces();
@@ -683,12 +865,20 @@ public class Board extends JPanel {
 					System.out.println("Using " + specialPower);
 					sm.usingSpecialPower = true;
 					if(specialPower.equals("DWARVEN_AXE")) {
-						sm.dwarvenAxeInitialSquare = selected; 
+						sm.dwarvenAxeInitial = selected; 
 						updateSpMessage("Choose square from which to dwarven axe");
 					}
 					else if(specialPower.equals("RAMPAGE")) {
-						sm.rampageInitialSquare = selected;
+						sm.rampageInitial = selected;
 						updateSpMessage("Choose square from which to use rampage");
+					}
+					else if(specialPower.equals("FLIGHT")) {
+						sm.flight = true;
+						updateSpMessage("Choose destination");
+					}
+					else if(specialPower.equals("SWIFT_STEED")) {
+						sm.swiftSteed = true;
+						updateSpMessage("Choose destination");
 					}
 					clearButtonsOnSpPanel();
 					if(!cancelAlreadyExists()) {
@@ -708,8 +898,8 @@ public class Board extends JPanel {
 					//remove cancel
 					updateSpMessage("...");
 					clearButtonsOnSpPanel();
-					if(sm.dwarvenAxeMoveSquare != null)
-						sm.dwarvenAxeMoveSquare.removeSelectedBorder();
+					if(sm.dwarvenAxeMove != null)
+						sm.dwarvenAxeMove.removeSelectedBorder();
 					for(Square daTarget : sm.dwarvenAxeTargets) {
 						if(daTarget != null)
 							daTarget.removeSelectedBorder();
@@ -855,10 +1045,10 @@ public class Board extends JPanel {
 				else if(selected != null && sm.usingSpecialPower) {
 					
 					if(specialPower.equals("DWARVEN_AXE")) {
-						if(sm.dwarvenAxeMoveSquare != null && sm.dwarvenAxeTargetNumber <= 3) {
+						if(sm.dwarvenAxeMove != null && sm.dwarvenAxeTargetNumber <= 3) {
 							//debug
 							System.out.println("Choosing a target");
-							if(square.isOccupied() && square.occupant.team != playerTeam && square.isWithinAxeRange(sm.dwarvenAxeMoveSquare)) {
+							if(square.isOccupied() && square.occupant.team != playerTeam && square.isWithinAxeRange(sm.dwarvenAxeMove)) {
 								boolean alreadyInTargets = false;
 								for(Square s : sm.dwarvenAxeTargets) {
 									if(square == s) {
@@ -873,13 +1063,13 @@ public class Board extends JPanel {
 								}
 							}
 						}
-						else if(sm.dwarvenAxeInitialSquare != null &&
-								(square == sm.dwarvenAxeInitialSquare ||
+						else if(sm.dwarvenAxeInitial != null &&
+								(square == sm.dwarvenAxeInitial ||
 								(!(square.isOccupied() || square.isForbidden()) && 
-										square.isAdjacent(sm.dwarvenAxeInitialSquare)))) {
+										square.isAdjacent(sm.dwarvenAxeInitial)))) {
 							//debug
 							System.out.println("Choose targets");
-							sm.dwarvenAxeMoveSquare = square;	
+							sm.dwarvenAxeMove = square;	
 							addDoneButton();
 							square.setTargetBorder();
 							updateSpMessage("Choose upto 3 targets");
@@ -887,17 +1077,33 @@ public class Board extends JPanel {
 						}
 					}
 					else if(specialPower.equals("RAMPAGE")) {
-						if(sm.rampageInitialSquare != null &&
-								(square == sm.rampageInitialSquare ||
+						if(sm.rampageInitial != null &&
+								(square == sm.rampageInitial ||
 								(!(square.isOccupied || square.isForbidden) &&
-										square.isAdjacent(sm.rampageInitialSquare)))) {
-							sm.rampageMoveSquare = square;
-							rampage(sm.rampageInitialSquare, sm.rampageMoveSquare);
+										square.isAdjacent(sm.rampageInitial)))) {
+							sm.rampageMove = square;
+							rampage(sm.rampageInitial, sm.rampageMove);
 							updateSpMessage("...");
 							clearButtonsOnSpPanel();
 							selected = target = null;
 						}
 								
+					}
+					else if(specialPower.equals("FLIGHT")) {
+						if(sm.flight && isValidFlight(selected, square)) {
+							flight(selected, square);
+							updateSpMessage("...");
+							clearButtonsOnSpPanel();
+							selected = target = null;
+						}
+					}
+					else if(specialPower.equals("SWIFT_STEED")) {
+						if(sm.swiftSteed && isValidSwiftSteed(selected, square)) {
+							swiftSteed(selected, square);
+							updateSpMessage("...");
+							clearButtonsOnSpPanel();
+							selected = target = null;
+						}
 					}
 				}
 			}
@@ -908,5 +1114,8 @@ public class Board extends JPanel {
 		public static final int BOARD_DIM = 10;
 		public static final boolean ORC = false;
 		public static final boolean HUMAN = true;
+
+
+
 	
 	} //end class

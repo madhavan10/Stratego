@@ -147,6 +147,7 @@ public class Stratego extends JFrame {
 				setTitle("Stratego " + teamAsStr);
 			} else if(response.startsWith("SETUP") && !response.equals("SETUP_TIME_OVER")) {
 				int setupTime = Integer.parseInt(response.substring(6));
+				board.setGameStarted(true);
 				updateMessageLabel(setupTime + " minutes to setup");
 			} else if(response.equals("SETUP_TIME_OVER")) {
 				board.setupTimeOver();
@@ -200,6 +201,24 @@ public class Stratego extends JFrame {
 				int x2 = Integer.parseInt(moveStr.substring(2, 3));
 				int y2 = Integer.parseInt(moveStr.substring(3, 4));
 				board.opponentRampage(x1, y1, x2, y2);
+				board.setIsMyTurn(true);
+				updateMessageLabel("Your turn | ");
+			} else if(response.startsWith("OPPONENT_FLIGHT")) {
+				String moveStr = response.substring(16, 20);
+				int x1 = Integer.parseInt(moveStr.substring(0, 1));
+				int y1 = Integer.parseInt(moveStr.substring(1, 2));
+				int x2 = Integer.parseInt(moveStr.substring(2, 3));
+				int y2 = Integer.parseInt(moveStr.substring(3, 4));
+				board.opponentFlight(x1, y1, x2, y2);
+				board.setIsMyTurn(true);
+				updateMessageLabel("Your turn | ");
+			} else if(response.startsWith("OPPONENT_SWIFT_STEED")) {
+				String moveStr = response.substring(21, 25);
+				int x1 = Integer.parseInt(moveStr.substring(0, 1));
+				int y1 = Integer.parseInt(moveStr.substring(1, 2));
+				int x2 = Integer.parseInt(moveStr.substring(2, 3));
+				int y2 = Integer.parseInt(moveStr.substring(3, 4));
+				board.opponentSwiftSteed(x1, y1, x2, y2);
 				board.setIsMyTurn(true);
 				updateMessageLabel("Your turn | ");
 			} else if(response.equals("OTHER_PLAYER_LEFT")) {

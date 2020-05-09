@@ -6,21 +6,21 @@ public class SPSM {
 	boolean detectEnemy = false;
 	boolean longbow = false;
 	boolean swiftSteed = false;
-	Square dwarvenAxeInitialSquare = null;
-	Square dwarvenAxeMoveSquare = null;
+	Square dwarvenAxeInitial = null;
+	Square dwarvenAxeMove = null;
 	Square[] dwarvenAxeTargets = new Square[3];
 	int dwarvenAxeTargetNumber = 0;
-	Square rampageInitialSquare = null;
-	Square rampageMoveSquare = null;
+	Square rampageInitial = null;
+	Square rampageMove = null;
 
 	public void setAllFalse() {
 		usingSpecialPower = false;
 		flight = detectEnemy = longbow = swiftSteed = false;
-		dwarvenAxeInitialSquare = dwarvenAxeMoveSquare = null;
+		dwarvenAxeInitial = dwarvenAxeMove = null;
 		for(int i = 0; i < dwarvenAxeTargets.length; i++)
 			dwarvenAxeTargets[i] = null;
 		dwarvenAxeTargetNumber = 0;
-		rampageInitialSquare = rampageMoveSquare = null;
+		rampageInitial = rampageMove = null;
 	}
 
 }

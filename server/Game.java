@@ -72,29 +72,25 @@ public class Game {
 				String command = input.nextLine();
 				System.out.println(command);
 				if(command.startsWith("MOVE")) {
-					try {
-						move(this);
-						output.println("MOVE_OK");
-						opponent.output.println("OPPONENT_MOVED " + command.substring(5, 9));
-					} catch(IllegalStateException e) {
-						output.println(e.getMessage());
-					}
+					move(this);
+					output.println("MOVE_OK");
+					opponent.output.println("OPPONENT_MOVED " + command.substring(5, 9));
 				} else if(command.startsWith("DWARVEN_AXE")) {
-					try {
-						move(this);
-						output.println("MOVE_OK");
-						opponent.output.println("OPPONENT_DWARVEN_AXE " + command.substring(12));
-					} catch(IllegalStateException e) {
-						output.println(e.getMessage());
-					}
+					move(this);
+					output.println("MOVE_OK");
+					opponent.output.println("OPPONENT_DWARVEN_AXE " + command.substring(12));
 				} else if(command.startsWith("RAMPAGE")) {
-					try {
-						move(this);
-						output.println("MOVE_OK");
-						opponent.output.println("OPPONENT_RAMPAGE " + command.substring(8, 12));
-					} catch (IllegalStateException e) {
-						output.println(e.getMessage());
-					}
+					move(this);
+					output.println("MOVE_OK");
+					opponent.output.println("OPPONENT_RAMPAGE " + command.substring(8, 12));
+				} else if(command.startsWith("FLIGHT")) {
+					move(this);
+					output.println("MOVE_OK");
+					opponent.output.println("OPPONENT_FLIGHT " + command.substring(7, 11));
+				} else if(command.startsWith("SWIFT_STEED")) {
+					move(this);
+					output.println("MOVE_OK");
+					opponent.output.println("OPPONENT_SWIFT_STEED " + command.substring(12, 16));
 				} else if(command.equals("FLAG")) {
 					output.println("VICTORY");
 					opponent.output.println("DEFEAT");
