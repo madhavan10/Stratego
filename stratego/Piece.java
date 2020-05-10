@@ -27,7 +27,7 @@ public class Piece extends JLabel {
 		
 		setText(this.toString());
 		setForeground(team ? Color.BLACK : Color.WHITE);
-		setFont(new Font("Arial", Font.BOLD, 12));
+		setFont(getFont().deriveFont(Font.BOLD, 12));
 	}
 	
 	public Piece(int level, String name, boolean team, ArrayList<String> specialPowerNames) {
@@ -40,7 +40,7 @@ public class Piece extends JLabel {
 		
 		setText(this.toString());
 		setForeground(team ? Color.BLACK : Color.WHITE);
-		setFont(new Font("Arial", Font.BOLD, 12));
+		setFont(getFont().deriveFont(Font.BOLD, 12));
 	}
 
 	public Piece(int level, String name, boolean team, String spName) {
@@ -54,7 +54,7 @@ public class Piece extends JLabel {
 		
 		setText(this.toString());
 		setForeground(team ? Color.BLACK : Color.WHITE);
-		setFont(new Font("Arial", Font.BOLD, 12));
+		setFont(getFont().deriveFont(Font.BOLD, 12));
 	}
 	
 	public boolean isDead() {

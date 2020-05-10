@@ -10,7 +10,7 @@ import javax.swing.Timer;
 
 public class Game {
 	Player player1, player2;
-	Player currentPlayer;
+	//Player currentPlayer;
 	boolean firstPlayerJoined;
 	boolean isSetupTime;
 	
@@ -22,6 +22,7 @@ public class Game {
 		isSetupTime = true;
 	}
 	
+	/*
 	public synchronized void move(Player player) {
 		if(isSetupTime)
 			return;
@@ -33,6 +34,7 @@ public class Game {
 		}
 		currentPlayer = currentPlayer.opponent;
 	}
+	*/
 	
 	public class Player implements Runnable, ActionListener {
 		
@@ -72,31 +74,31 @@ public class Game {
 				String command = input.nextLine();
 				System.out.println(command);
 				if(command.startsWith("MOVE")) {
-					move(this);
+					//move(this);
 					output.println("MOVE_OK");
 					opponent.output.println("OPPONENT_MOVED " + command.substring(5, 9));
 				} else if(command.startsWith("DWARVEN_AXE")) {
-					move(this);
+					//move(this);
 					output.println("MOVE_OK");
 					opponent.output.println("OPPONENT_DWARVEN_AXE " + command.substring(12));
 				} else if(command.startsWith("RAMPAGE")) {
-					move(this);
+					//move(this);
 					output.println("MOVE_OK");
 					opponent.output.println("OPPONENT_RAMPAGE " + command.substring(8, 12));
 				} else if(command.startsWith("FLIGHT")) {
-					move(this);
+					//move(this);
 					output.println("MOVE_OK");
 					opponent.output.println("OPPONENT_FLIGHT " + command.substring(7, 11));
 				} else if(command.startsWith("SWIFT_STEED")) {
-					move(this);
+					//move(this);
 					output.println("MOVE_OK");
 					opponent.output.println("OPPONENT_SWIFT_STEED " + command.substring(12, 16));
 				} else if(command.startsWith("DETECT")) {
-					move(this);
+					//move(this);
 					output.println("MOVE_OK");
 					opponent.output.println("OPPONENT_DETECT " + command.substring(7, 11));
 				} else if(command.startsWith("LONGBOW")) {
-					move(this);
+					//move(this);
 					output.println("MOVE_OK");
 					opponent.output.println("OPPONENT_LONGBOW " + command.substring(8, 12));
 				} else if(command.equals("FLAG")) {
@@ -142,8 +144,10 @@ public class Game {
 				timer.setRepeats(false);
 				timer.start();
 			}
+			/*
 			if(team == ORC) currentPlayer = this;
 			else currentPlayer = opponent;
+			*/
 		}
 		
 		private boolean getTeamSelectionFromClient() throws Exception {

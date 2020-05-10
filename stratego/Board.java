@@ -1130,7 +1130,7 @@ public class Board extends JPanel {
 				else if(selected != null && sm.usingSpecialPower) {
 					
 					if(specialPower.equals("DWARVEN_AXE")) {
-						if(sm.dwarvenAxeMove != null && sm.dwarvenAxeTargetNumber <= 3) {
+						if(sm.dwarvenAxeMove != null && sm.dwarvenAxeTargetNumber <= 2) {
 							//debug
 							System.out.println("Choosing a target");
 							if(square.isOccupied() && square.occupant.team != playerTeam && square.isWithinAxeRange(sm.dwarvenAxeMove)) {

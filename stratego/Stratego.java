@@ -80,10 +80,10 @@ public class Stratego extends JFrame {
 		
 		messageLabel = new JLabel("...");
 		messageLabel.setHorizontalAlignment(SwingConstants.LEFT);
-		messageLabel.setFont(new Font("Arial", Font.PLAIN, 16));
+		messageLabel.setFont(messageLabel.getFont().deriveFont(Font.PLAIN, 16));
 		
 		eventLabel = new JLabel("...");
-		eventLabel.setFont(new Font("Arial", Font.PLAIN, 16));
+		eventLabel.setFont(eventLabel.getFont().deriveFont(Font.PLAIN, 16));
 		eventLabel.setHorizontalAlignment(SwingConstants.RIGHT);
 		
 		messagePanel = new JPanel();
