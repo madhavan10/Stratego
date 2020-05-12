@@ -22,20 +22,6 @@ public class Game {
 		isSetupTime = true;
 	}
 	
-	/*
-	public synchronized void move(Player player) {
-		if(isSetupTime)
-			return;
-		if(player != currentPlayer) {
-			throw new IllegalStateException("MESSAGE Not your turn");
-		}
-		if(player.opponent == null) {
-			throw new IllegalStateException("MESSAGE You don't have an opponent yet");
-		}
-		currentPlayer = currentPlayer.opponent;
-	}
-	*/
-	
 	public class Player implements Runnable, ActionListener {
 		
 		boolean team;
@@ -68,37 +54,34 @@ public class Game {
 		}
 
 		private void processCommands() {
-			//System.out.println("Process commands");
 			while(input.hasNextLine()) {
-				//System.out.println("Process commands loop head");
 				String command = input.nextLine();
 				System.out.println(command);
-				if(command.startsWith("MOVE")) {
-					//move(this);
+				if(command.startsWith("MOVE")) {			
 					output.println("MOVE_OK");
 					opponent.output.println("OPPONENT_MOVED " + command.substring(5, 9));
-				} else if(command.startsWith("DWARVEN_AXE")) {
-					//move(this);
+				} else if(command.startsWith("REPEAT_ATTACK")) {
+					output.println("OK");
+					opponent.output.println("OPPONENT_REPEAT_ATTACK " + command.substring(14, 18));
+				} else if(command.equals("STOP_REPEAT_ATTACK")) {
+					output.println("MOVE_OK");
+					opponent.output.println("OPPONENT_STOP_REPEAT_ATTACK");
+				} else if(command.startsWith("DWARVEN_AXE")) {					
 					output.println("MOVE_OK");
 					opponent.output.println("OPPONENT_DWARVEN_AXE " + command.substring(12));
-				} else if(command.startsWith("RAMPAGE")) {
-					//move(this);
+				} else if(command.startsWith("RAMPAGE")) {				
 					output.println("MOVE_OK");
 					opponent.output.println("OPPONENT_RAMPAGE " + command.substring(8, 12));
-				} else if(command.startsWith("FLIGHT")) {
-					//move(this);
+				} else if(command.startsWith("FLIGHT")) {					
 					output.println("MOVE_OK");
 					opponent.output.println("OPPONENT_FLIGHT " + command.substring(7, 11));
-				} else if(command.startsWith("SWIFT_STEED")) {
-					//move(this);
+				} else if(command.startsWith("SWIFT_STEED")) {					
 					output.println("MOVE_OK");
 					opponent.output.println("OPPONENT_SWIFT_STEED " + command.substring(12, 16));
-				} else if(command.startsWith("DETECT")) {
-					//move(this);
+				} else if(command.startsWith("DETECT")) {					
 					output.println("MOVE_OK");
 					opponent.output.println("OPPONENT_DETECT " + command.substring(7, 11));
-				} else if(command.startsWith("LONGBOW")) {
-					//move(this);
+				} else if(command.startsWith("LONGBOW")) {					
 					output.println("MOVE_OK");
 					opponent.output.println("OPPONENT_LONGBOW " + command.substring(8, 12));
 				} else if(command.equals("FLAG")) {
@@ -144,10 +127,6 @@ public class Game {
 				timer.setRepeats(false);
 				timer.start();
 			}
-			/*
-			if(team == ORC) currentPlayer = this;
-			else currentPlayer = opponent;
-			*/
 		}
 		
 		private boolean getTeamSelectionFromClient() throws Exception {

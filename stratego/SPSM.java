@@ -5,6 +5,7 @@ public class SPSM {
 	boolean flight = false;
 	boolean detectEnemy = false;
 	boolean longbow = false;
+	Piece repeatAttacker = null;
 	boolean swiftSteed = false;
 	Square dwarvenAxeInitial = null;
 	Square dwarvenAxeMove = null;
@@ -21,6 +22,7 @@ public class SPSM {
 			dwarvenAxeTargets[i] = null;
 		dwarvenAxeTargetNumber = 0;
 		rampageInitial = rampageMove = null;
+		repeatAttacker = null;
 	}
 
 }

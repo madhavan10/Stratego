@@ -158,6 +158,18 @@ public class Stratego extends JFrame {
 					updateMessageLabel("Opponent to play");
 					board.setIsMyTurn(false);
 				}
+			} else if(response.equals("OK")) {
+				updateMessageLabel("...");
+			} else if(response.startsWith("OPPONENT_REPEAT_ATTACK")) {
+				String moveStr = response.substring(23, 27);
+				int x1 = Integer.parseInt(moveStr.substring(0, 1));
+				int y1 = Integer.parseInt(moveStr.substring(1, 2));
+				int x2 = Integer.parseInt(moveStr.substring(2, 3));
+				int y2 = Integer.parseInt(moveStr.substring(3, 4));
+				board.moveOpponentPiece(x1, y1, x2, y2);
+			} else if(response.equals("OPPONENT_STOP_REPEAT_ATTACK")) {
+				board.setIsMyTurn(true);
+				updateMessageLabel("Your turn | ");
 			} else if(response.equals("MOVE_OK")) {
 				if(!board.isSetupTime()) {
 					board.setIsMyTurn(false);

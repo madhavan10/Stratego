@@ -316,6 +316,8 @@ public class Board extends JPanel {
 			//debug
 			//System.out.println("square1 occupant: " + square1.getOccupant());
 			int level1 = square1.getOccupant().getLevel();
+			if(buttonAlreadyExists("end turn") && square1.occupant != sm.repeatAttacker)
+				return false;
 			if(level1 == Piece.FLAG || level1 == Piece.STRONGHOLD)
 				return false;
 			if(square2.y == square1.y)
@@ -384,6 +386,19 @@ public class Board extends JPanel {
 					square1.remove(square1.getOccupant());
 					square1.setOccupant(null);
 					
+					//repeat attack
+					if(!flag && square2.occupant.level == 6 && square2.occupant.team == ORC) {
+						shadeOccupiedSquares();
+						if(adjacentTarget(square2)) {
+							out.println("REPEAT_ATTACK " + square1.x + "" + square1.y + "" + square2.x + "" + square2.y);
+							updateSpMessage("You may use repeat attack or end turn");
+							if(!buttonAlreadyExists("end turn"))
+								addEndTurnButton();
+							sm.repeatAttacker = square2.occupant;
+							return;
+						}
+					}
+					
 				}
 				else if(square1.getOccupant().clash(square2.getOccupant()) < 0) {
 					square1.remove(square1.getOccupant());
@@ -399,6 +414,9 @@ public class Board extends JPanel {
 				}
 			}
 			shadeOccupiedSquares();
+			sm.setAllFalse();
+			clearButtonsOnSpPanel();
+			updateSpMessage("...");
 			out.println("MOVE " + square1.x + "" + square1.y + "" + square2.x + "" + square2.y);
 			if(flag)
 				out.println("FLAG");
@@ -437,6 +455,7 @@ public class Board extends JPanel {
 					square2.add(square1.getOccupant());
 					square2.getOccupant().setVisible(true);
 					
+					square2.setLastMoveBorder();
 					square1.remove(square1.getOccupant());
 					square1.setOccupant(null);
 					
@@ -467,11 +486,27 @@ public class Board extends JPanel {
 			spPanel.repaint();
 			spPanel.revalidate();
 		}
-
+		
+		private void addEndTurnButton() {
+			final JButton endTurn = new JButton("end turn");
+			endTurn.addMouseListener(new MouseAdapter() {
+				public void mouseClicked(MouseEvent e) {
+					out.println("STOP_REPEAT_ATTACK");
+					updateSpMessage("...");
+					clearButtonsOnSpPanel();
+					sm.setAllFalse();
+					selected = target = null;
+				}
+			});
+			spPanel.add(endTurn);
+			spPanel.repaint();
+			spPanel.revalidate();
+		}
+		
 		private void addDoneButton() {
 			final JButton done = new JButton("done");
 			done.addMouseListener(new MouseAdapter() {
-				public void mouseClicked(MouseEvent e) {
+				public void mouseClicked(MouseEvent e) { 
 					dwarvenAxe(sm.dwarvenAxeInitial, sm.dwarvenAxeMove, sm.dwarvenAxeTargets);
 					updateSpMessage("...");
 					clearButtonsOnSpPanel();
@@ -481,6 +516,25 @@ public class Board extends JPanel {
 			spPanel.add(done);
 			spPanel.repaint();
 			spPanel.revalidate();
+		}
+		
+		private ArrayList<Square> getAdjacentSquares(Square square) {
+			ArrayList<Square> result = new ArrayList<Square>();
+			for(int i = 0; i < BOARD_DIM; i++) {
+				for(Square s : board[i])
+					if(s.isAdjacent(square))
+						result.add(s);
+			}
+			return result;
+		}
+		
+		private boolean adjacentTarget(Square s) {
+			for(Square adj : getAdjacentSquares(s)) {
+				if(adj.isOccupied && adj.occupant.team != s.occupant.team) {
+					 return true;
+				}
+			}
+			return false;
 		}
 		
 		private ArrayList<Square> getRampageTargets(Square square) {
@@ -495,6 +549,7 @@ public class Board extends JPanel {
 			}
 			return targets;
 		}
+		
 		private void rampage(Square initial, Square move) {
 			updateEventLabel("...");
 			hideEnemyPieces();
@@ -922,11 +977,11 @@ public class Board extends JPanel {
 			shadeOccupiedSquares();			
 		}
 		
-		private boolean cancelAlreadyExists() {
+		private boolean buttonAlreadyExists(String text) {
 			for(Component c : spPanel.getComponents()) {
 				if(c instanceof JButton) {
 					JButton button = (JButton) c;
-					if(button.getText().equalsIgnoreCase("cancel"))
+					if(button.getText().equalsIgnoreCase(text))
 						return true;
 				}
 			}
@@ -966,7 +1021,7 @@ public class Board extends JPanel {
 						updateSpMessage("Choose longbow target");
 					}
 					clearButtonsOnSpPanel();
-					if(!cancelAlreadyExists()) {
+					if(!buttonAlreadyExists("cancel")) {
 						addCancelButton();
 					}
 				}
