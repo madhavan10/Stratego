@@ -24,11 +24,12 @@ import java.util.concurrent.Executors;
 public class StrategoServer {
 	
 	public static void main(String[] args) throws Exception {
-		if(args.length != 1) {
-			System.err.println("Pass length of setup in minutes as the sole command line argument");
-			return;
+		final int SETUP_TIME_IN_MINUTES;
+		if(args.length >= 1) {
+			SETUP_TIME_IN_MINUTES = Integer.parseInt(args[0]);
 		}
-		final int SETUP_TIME_IN_MINUTES = Integer.parseInt(args[0]);
+		else SETUP_TIME_IN_MINUTES = 1;
+		 
 		final int PORT = 58901;
         try (ServerSocket listener = new ServerSocket(PORT)) {
             System.out.println("Stratego Server is Running...");

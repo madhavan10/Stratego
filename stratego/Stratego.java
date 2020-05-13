@@ -2,8 +2,6 @@ package stratego;
 
 import java.awt.BorderLayout;
 import java.awt.Container;
-import java.awt.EventQueue;
-
 import javax.swing.JButton;
 import javax.swing.JFrame;
 import javax.swing.JLabel;
@@ -16,16 +14,7 @@ import java.io.IOException;
 import java.io.PrintWriter;
 import java.net.Socket;
 import java.util.Scanner;
-import java.awt.BorderLayout;
-import java.awt.Color;
-import java.awt.GridLayout;
-import java.awt.event.MouseAdapter;
-import java.awt.event.MouseEvent;
-import java.awt.event.MouseMotionAdapter;
-import java.io.PrintWriter;
-import javax.swing.BorderFactory;
-import javax.swing.JLabel;
-import javax.swing.JPanel;
+
 
 import javax.swing.SwingConstants;
 
@@ -39,11 +28,11 @@ public class Stratego extends JFrame {
 	 * @throws InterruptedException 
 	 */
 	public static void main(String[] args) throws IOException {
-		if(args.length != 1) {
-			System.err.println("Pass the IP of the Server as the sole command-line argument");
-			return;
+		final String serverIP;
+		if(args.length >= 1) {
+			serverIP = args[0];
 		}
-		final String serverIP = args[0];
+		else serverIP = JOptionPane.showInputDialog("Enter server address");
 		final Stratego frame = new Stratego(serverIP);
 		frame.setVisible(true);
 		frame.play();
