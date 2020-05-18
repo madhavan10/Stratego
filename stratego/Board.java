@@ -22,7 +22,8 @@ public class Board extends JPanel {
 		private final Square[][] board = new Square[BOARD_DIM][BOARD_DIM];
 		private final Piece[] whitePieces = new Piece[NO_OF_PIECES];
 		private final Piece[] blackPieces = new Piece[NO_OF_PIECES];
-		
+		private final boolean handicap;
+
 		private boolean isSetupTime;
 		private boolean playerTeam;
 		private boolean gameStarted;
@@ -38,7 +39,8 @@ public class Board extends JPanel {
 		private final JPanel spPanel;
 		private final JLabel eventLabel;
 		
-		public Board(PrintWriter out, JPanel spPanel, JLabel eventLabel) {
+		public Board(PrintWriter out, JPanel spPanel, JLabel eventLabel, boolean handicap) {
+			this.handicap = handicap;
 			this.out = out;
 			this.spPanel = spPanel;
 			spMessage = new JLabel("...");
@@ -84,7 +86,7 @@ public class Board extends JPanel {
 		}
 		
 		public void setGameStarted(boolean b) {
-			gameStarted = true;	
+			gameStarted = b;	
 		}
 		
 		public void setupTimeOver() {
@@ -141,6 +143,8 @@ public class Board extends JPanel {
 		} //end method
 		
 		private void hideEnemyPieces() {
+			if(!isSetupTime && handicap)
+				return;
 			for(Piece piece: whitePieces) {
 				if(piece.getTeam() != playerTeam) {
 					piece.setVisible(false);

@@ -29,15 +29,20 @@ public class Stratego extends JFrame {
 	 */
 	public static void main(String[] args) throws IOException {
 		final String serverIP;
+		boolean handicap = false;
 		if(args.length >= 1) {
 			serverIP = args[0];
+			if(args.length >= 2 && args[1].equals("1")) {
+				handicap = true;
+			}
 		}
 		else serverIP = JOptionPane.showInputDialog("Enter server address");
-		final Stratego frame = new Stratego(serverIP);
+		final Stratego frame = new Stratego(serverIP, handicap);
 		frame.setVisible(true);
 		frame.play();
 	}
-	
+	private final boolean handicap;
+
 	private Socket socket;
 	private Scanner in;
 	private PrintWriter out;
@@ -55,7 +60,8 @@ public class Stratego extends JFrame {
 	 * Create the frame.
 	 * @param serverIP 
 	 */
-	public Stratego(String serverIP) throws IOException {
+	public Stratego(String serverIP, boolean handicap) throws IOException {
+		this.handicap = handicap;
 		socket = new Socket(serverIP, 58901);
 		in = new Scanner(socket.getInputStream());
 		out = new PrintWriter(socket.getOutputStream(), true);
@@ -86,7 +92,7 @@ public class Stratego extends JFrame {
 		auxPanel.add(spPanel, BorderLayout.NORTH);
 		auxPanel.add(messagePanel, BorderLayout.SOUTH);
 		
-		board = new Board(out, spPanel, eventLabel);
+		board = new Board(out, spPanel, eventLabel, handicap);
 		
 		Container contentPane = getContentPane();
 		contentPane.add(board, BorderLayout.CENTER);
