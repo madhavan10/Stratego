@@ -446,7 +446,7 @@ public class Board extends JPanel {
 				square2.setOccupant(square1.getOccupant());
 				square2.add(square1.getOccupant());
 				square2.setLastMoveBorder();
-				
+				square1.setSelectedBorder();
 				square1.remove(square1.getOccupant());
 				square1.setOccupant(null);
 			}
@@ -460,6 +460,7 @@ public class Board extends JPanel {
 					square2.getOccupant().setVisible(true);
 					
 					square2.setLastMoveBorder();
+					square1.setSelectedBorder();
 					square1.remove(square1.getOccupant());
 					square1.setOccupant(null);
 					
@@ -467,7 +468,7 @@ public class Board extends JPanel {
 				else if(square1.getOccupant().clash(square2.getOccupant()) < 0) {
 					updateEventLabel("Opponent lost " + square1.getOccupant());
 					square2.setLastMoveBorder();
-					
+					square1.setSelectedBorder();
 					square1.remove(square1.getOccupant());
 					square1.setOccupant(null);
 				}
@@ -478,6 +479,7 @@ public class Board extends JPanel {
 					square2.remove(square2.getOccupant());
 					square2.setOccupant(null);
 					square2.setLastMoveBorder();
+					square1.setSelectedBorder();
 				}
 			}
 			shadeOccupiedSquares();
@@ -596,6 +598,7 @@ public class Board extends JPanel {
 				initial.remove(initial.occupant);
 				initial.setOccupant(null);
 			}
+			initial.setSelectedBorder();
 			move.setLastMoveBorder();
 			Piece berserker = move.occupant;
 			
@@ -695,6 +698,7 @@ public class Board extends JPanel {
 			Square dest = board[x2][y2];
 			Piece theoden = src.occupant;
 			theoden.setVisible(true);
+			src.setSelectedBorder();
 			dest.setLastMoveBorder();
 			String result = theoden + " used Swift Steed:";
 			if(!dest.isOccupied) {
@@ -822,6 +826,7 @@ public class Board extends JPanel {
 			Square dest = board[x2][y2];
 			Piece ten = initial.occupant;
 			dest.add(ten);
+			initial.setSelectedBorder();
 			dest.setLastMoveBorder();
 			dest.setOccupant(ten);
 			initial.remove(ten);
@@ -937,6 +942,7 @@ public class Board extends JPanel {
 			refreshBorders();
 			Square initial = board[x1][y1];
 			Square move = board[x2][y2];
+			initial.setSelectedBorder();
 			move.setLastMoveBorder();
 			if(move != initial) {
 				move.setOccupant(initial.occupant);
