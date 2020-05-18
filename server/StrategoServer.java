@@ -29,7 +29,7 @@ public class StrategoServer {
 		if(args.length >= 1) {
 			SETUP_TIME_IN_MINUTES = Integer.parseInt(args[0]);
 		}
-		else SETUP_TIME_IN_MINUTES = JOptionPane.showInputDialog("Setup time! (minutes)");
+		else SETUP_TIME_IN_MINUTES = Integer.parseInt(JOptionPane.showInputDialog("Setup time! (minutes)"));
 		 
 		final int PORT = 58901;
         try (ServerSocket listener = new ServerSocket(PORT)) {
