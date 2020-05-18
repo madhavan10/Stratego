@@ -92,6 +92,7 @@ public class Stratego extends JFrame {
 				setTitle("Stratego " + teamAsStr);
 			} else if(response.startsWith("SETUP") && !response.equals("SETUP_TIME_OVER")) {
 				int setupTime = Integer.parseInt(response.substring(6));
+				board.setGameStarted(true);
 				messageLabel.setText(setupTime + " minutes to setup");
 				messagePanel.repaint();
 				messagePanel.revalidate();

@@ -20,6 +20,7 @@ public class Board extends JPanel {
 		private final Piece[] whitePieces = new Piece[NO_OF_PIECES];
 		private final Piece[] blackPieces = new Piece[NO_OF_PIECES];
 		
+		private boolean gameStarted;
 		private boolean isSetupTime;
 		private boolean playerTeam;
 		
@@ -37,6 +38,7 @@ public class Board extends JPanel {
 			createSquares();
 			createPieces();
 			setPieces();
+			gameStarted = false;
 			isSetupTime = true;
 			selected = null;
 		}
@@ -48,7 +50,11 @@ public class Board extends JPanel {
 		public boolean isSetupTime() {
 			return isSetupTime;
 		}
-		
+
+		public setGameStarted(boolean b) {
+			gameStarted = b;
+		}
+
 		public boolean getPlayerTeam() {
 			return playerTeam;
 		}
@@ -254,10 +260,6 @@ public class Board extends JPanel {
 			repaint();
 			revalidate();
 		}
-
-		private void setLastMoveBorder(Square s) {
-			s.setBorder(BorderFactory.createLineBorder(Color.green, 3));
-		}
 		
 		private void shadeOccupiedSquares() {
 			for(int j = 0; j <= 9; j++) {
@@ -401,8 +403,8 @@ public class Board extends JPanel {
 			if(!square2.isOccupied()) {
 				square2.setOccupant(square1.getOccupant());
 				square2.add(square1.getOccupant());
-				setLastMoveBorder(square2);
-				
+				square2.setLastMoveBorder();
+				square1.setRedBorder();
 				square1.remove(square1.getOccupant());
 				square1.setOccupant(null);
 			}
@@ -414,16 +416,16 @@ public class Board extends JPanel {
 					square2.setOccupant(square1.getOccupant());
 					square2.add(square1.getOccupant());
 					square2.getOccupant().setVisible(true);
-					setLastMoveBorder(square2);
-
+					square2.setLastMoveBorder();
+					square1.setRedBorder();
 					square1.remove(square1.getOccupant());
 					square1.setOccupant(null);
 					
 				}
 				else if(square1.getOccupant().clash(square2.getOccupant()) < 0) {
 					updateEventLabel("Opponent lost " + square1.getOccupant());
-					setLastMoveBorder(square2);
-					
+					square2.setLastMoveBorder();
+					square1.setRedBorder();
 					square1.remove(square1.getOccupant());
 					square1.setOccupant(null);
 				}
@@ -433,7 +435,8 @@ public class Board extends JPanel {
 					square1.setOccupant(null);
 					square2.remove(square2.getOccupant());
 					square2.setOccupant(null);
-					setLastMoveBorder(square2);
+					square2.setLastMoveBorder();
+					square1.setRedBorder();
 				}
 			}
 			shadeOccupiedSquares();
@@ -442,6 +445,8 @@ public class Board extends JPanel {
 		private class SquareMotionListener extends MouseMotionAdapter {
 			@Override
 			public void mouseDragged(MouseEvent e) {
+				if(!gameStarted)
+					return;
 				//System.out.println("Mouse Dragged!");
 				Square square = (Square) e.getSource();
 				if(square.isOccupied() && square.getOccupant().getTeam() == playerTeam)
