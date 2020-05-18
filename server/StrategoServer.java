@@ -1,6 +1,7 @@
 package server;
 
 import java.net.ServerSocket;
+import javax.swing.JOptionPane;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 
@@ -28,7 +29,7 @@ public class StrategoServer {
 		if(args.length >= 1) {
 			SETUP_TIME_IN_MINUTES = Integer.parseInt(args[0]);
 		}
-		else SETUP_TIME_IN_MINUTES = 1;
+		else SETUP_TIME_IN_MINUTES = JOptionPane.showInputDialog("Setup time! (minutes)");
 		 
 		final int PORT = 58901;
         try (ServerSocket listener = new ServerSocket(PORT)) {
