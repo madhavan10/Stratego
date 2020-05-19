@@ -9,6 +9,8 @@ import javax.swing.JLabel;
 @SuppressWarnings("serial")
 public class Piece extends JLabel {
 	
+	private static int lastId = 0;
+	final int id;
 	final int level;
 	final String name;
 	final boolean team;
@@ -17,7 +19,7 @@ public class Piece extends JLabel {
 	private boolean isDead;
 	
 	public Piece(int level, String name, boolean team) {
-		
+		id = lastId++;
 		this.level = level;
 		this.name = name;
 		this.team = team;
@@ -31,6 +33,7 @@ public class Piece extends JLabel {
 	}
 	
 	public Piece(int level, String name, boolean team, ArrayList<String> specialPowerNames) {
+		id = lastId++;
 		this.level = level;
 		this.name = name;
 		this.team = team;
@@ -44,6 +47,7 @@ public class Piece extends JLabel {
 	}
 
 	public Piece(int level, String name, boolean team, String spName) {
+		id = lastId++;
 		this.level = level;
 		this.name = name;
 		this.team = team;

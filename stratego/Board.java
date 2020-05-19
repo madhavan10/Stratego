@@ -13,6 +13,8 @@ import javax.swing.JLabel;
 import javax.swing.JButton;
 import java.awt.Component;
 import java.util.ArrayList;
+import java.util.HashMap;
+
 import javax.swing.JPanel;
 
 
@@ -23,6 +25,7 @@ public class Board extends JPanel {
 		private final Piece[] whitePieces = new Piece[NO_OF_PIECES];
 		private final Piece[] blackPieces = new Piece[NO_OF_PIECES];
 		private final boolean handicap;
+		private final HashMap<String, Boolean> boardStates = new HashMap<String, Boolean>(1024);
 
 		private boolean isSetupTime;
 		private boolean playerTeam;
@@ -317,13 +320,17 @@ public class Board extends JPanel {
 		}
 		
 		private boolean isValidMove(Square square1, Square square2) {
-			//debug
-			//System.out.println("square1 occupant: " + square1.getOccupant());
+
 			int level1 = square1.getOccupant().getLevel();
+			//repeat attack on going
 			if(buttonAlreadyExists("end turn") && square1.occupant != sm.repeatAttacker)
 				return false;
 			if(level1 == Piece.FLAG || level1 == Piece.STRONGHOLD)
 				return false;
+			
+			if(isRepeatedPosition(square1, square2))
+				return false;
+			
 			if(square2.y == square1.y)
 				if(Math.abs(square2.x - square1.x) == 1)
 					return true;
@@ -366,6 +373,30 @@ public class Board extends JPanel {
 			return false;
 		}
 		
+		private boolean isRepeatedPosition(Square square1, Square square2) {
+			if(!square2.isOccupied()) {
+				square2.setOccupant(square1.occupant);
+				square1.setOccupant(null);
+				boolean previousState = boardStates.containsKey(getBoardState());
+				square1.setOccupant(square2.occupant);
+				square2.setOccupant(null);
+				if(previousState)
+					return true;
+			}
+			return false;
+		}
+
+		private String getBoardState() {
+			String result = "";
+			for(int j = 0; j < BOARD_DIM; j++)
+				for(int i = 0; i < BOARD_DIM; i++)
+					if(board[i][j] != null)
+						result += board[i][j] + ",";
+					else
+						result += "null,";
+			return result;
+		}
+
 		private void movePiece(Square square1, Square square2) {
 			updateEventLabel("...");
 			hideEnemyPieces();
@@ -417,6 +448,7 @@ public class Board extends JPanel {
 					square2.setOccupant(null);
 				}
 			}
+			boardStates.put(getBoardState(), true);
 			shadeOccupiedSquares();
 			sm.setAllFalse();
 			clearButtonsOnSpPanel();
@@ -513,10 +545,12 @@ public class Board extends JPanel {
 			final JButton done = new JButton("done");
 			done.addMouseListener(new MouseAdapter() {
 				public void mouseClicked(MouseEvent e) { 
-					dwarvenAxe(sm.dwarvenAxeInitial, sm.dwarvenAxeMove, sm.dwarvenAxeTargets);
-					updateSpMessage("...");
-					clearButtonsOnSpPanel();
-					selected = target = null;
+					if(sm.dwarvenAxeTargetNumber > 0) {
+						dwarvenAxe(sm.dwarvenAxeInitial, sm.dwarvenAxeMove, sm.dwarvenAxeTargets);
+						updateSpMessage("...");
+						clearButtonsOnSpPanel();
+						selected = target = null;
+					}
 				}
 			});
 			spPanel.add(done);
@@ -620,6 +654,8 @@ public class Board extends JPanel {
 		}
 		
 		private boolean isValidSwiftSteed(Square src, Square dest) {
+			if(isRepeatedPosition(src, dest))
+				return false;
 			if(!dest.isForbidden && (!dest.isOccupied || dest.occupant.team != playerTeam)) {
 				if(src.x == dest.x) {
 					if(Math.abs(src.y - dest.y) == 2) {
@@ -686,6 +722,7 @@ public class Board extends JPanel {
 				src.remove(theoden);
 				src.setOccupant(null);
 			}
+			boardStates.put(getBoardState(), true);
 			shadeOccupiedSquares();
 			sm.setAllFalse();
 			out.println("SWIFT_STEED " + src.x + "" + src.y + "" + dest.x + "" + dest.y);
@@ -814,6 +851,7 @@ public class Board extends JPanel {
 			dest.setOccupant(ten);
 			initial.remove(ten);
 			initial.setOccupant(null);
+			boardStates.put(getBoardState(), true);
 			shadeOccupiedSquares();
 			out.println("FLIGHT " + initial.x + "" + initial.y + "" + dest.x + "" + dest.y);
 			sm.setAllFalse();
@@ -837,6 +875,8 @@ public class Board extends JPanel {
 		}
 		
 		private boolean isValidFlight(Square initial, Square dest) {
+			if(isRepeatedPosition(initial, dest))
+				return false;
 			if(!dest.isOccupied) {
 				if(dest.x == initial.x) {
 					if(dest.y > initial.y) {
@@ -1064,6 +1104,32 @@ public class Board extends JPanel {
 			spPanel.add(cancel);
 			spPanel.repaint();
 			spPanel.revalidate();
+		}
+		
+		private class SPSM {
+			boolean usingSpecialPower = false;
+			boolean flight = false;
+			boolean detectEnemy = false;
+			boolean longbow = false;
+			Piece repeatAttacker = null;
+			boolean swiftSteed = false;
+			Square dwarvenAxeInitial = null;
+			Square dwarvenAxeMove = null;
+			Square[] dwarvenAxeTargets = new Square[3];
+			int dwarvenAxeTargetNumber = 0;
+			Square rampageInitial = null;
+			Square rampageMove = null;
+
+			public void setAllFalse() {
+				usingSpecialPower = false;
+				flight = detectEnemy = longbow = swiftSteed = false;
+				dwarvenAxeInitial = dwarvenAxeMove = null;
+				for(int i = 0; i < dwarvenAxeTargets.length; i++)
+					dwarvenAxeTargets[i] = null;
+				dwarvenAxeTargetNumber = 0;
+				rampageInitial = rampageMove = null;
+				repeatAttacker = null;
+			}
 		}
 		
 		private class SquareMotionListener extends MouseMotionAdapter {
