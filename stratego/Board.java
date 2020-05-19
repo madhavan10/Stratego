@@ -23,7 +23,8 @@ public class Board extends JPanel {
 		private final Piece[] whitePieces = new Piece[NO_OF_PIECES];
 		private final Piece[] blackPieces = new Piece[NO_OF_PIECES];
 		private final boolean handicap;
-
+		private Queue lastTwoMoves = new Queue(2);
+		
 		private boolean isSetupTime;
 		private boolean playerTeam;
 		private boolean gameStarted;
@@ -317,8 +318,8 @@ public class Board extends JPanel {
 		}
 		
 		private boolean isValidMove(Square square1, Square square2) {
-			//debug
-			//System.out.println("square1 occupant: " + square1.getOccupant());
+			if(!passesTwoSquareRule(new Move(square1, square2, square1.occupant)))
+				return false;
 			int level1 = square1.getOccupant().getLevel();
 			if(buttonAlreadyExists("end turn") && square1.occupant != sm.repeatAttacker)
 				return false;
@@ -366,9 +367,23 @@ public class Board extends JPanel {
 			return false;
 		}
 		
+		private boolean passesTwoSquareRule(Move move) {
+			if(lastTwoMoves.isFull()) {
+				Move move1 = lastTwoMoves.get(0);
+				Move move2 = lastTwoMoves.get(1);
+				if(move1 != null && move2 != null) {
+					if(move2.src == move.dest && move2.dest == move.src && move2.piece == move.piece &&
+							move1.src == move.src && move1.dest == move.dest && move1.piece == move.piece)
+						return false;
+				}
+			}
+			return true;
+		}
+		
 		private void movePiece(Square square1, Square square2) {
 			updateEventLabel("...");
 			hideEnemyPieces();
+			lastTwoMoves.insert(new Move(square1, square2, square1.occupant));
 			boolean flag = false;
 			if(!square2.isOccupied()) {	
 				square2.setOccupant(square1.getOccupant());
@@ -561,6 +576,7 @@ public class Board extends JPanel {
 		private void rampage(Square initial, Square move) {
 			updateEventLabel("...");
 			hideEnemyPieces();
+			lastTwoMoves.insert(new Move(initial, move, initial.occupant));
 			if(move != initial) {
 				move.setOccupant(initial.occupant);
 				move.add(initial.occupant);
@@ -622,6 +638,9 @@ public class Board extends JPanel {
 		}
 		
 		private boolean isValidSwiftSteed(Square src, Square dest) {
+			if(!passesTwoSquareRule(new Move(src, dest, src.occupant)))
+				return false;
+			
 			if(!dest.isForbidden && (!dest.isOccupied || dest.occupant.team != playerTeam)) {
 				if(src.x == dest.x) {
 					if(Math.abs(src.y - dest.y) == 2) {
@@ -660,6 +679,7 @@ public class Board extends JPanel {
 		
 		private void swiftSteed(Square src, Square dest) {
 			hideEnemyPieces();
+			lastTwoMoves.insert(new Move(src, dest, src.occupant));
 			Piece theoden = src.occupant;
 			if(!dest.isOccupied) {
 				dest.add(theoden);
@@ -752,6 +772,7 @@ public class Board extends JPanel {
 		
 		private void longbow(Square src, Square dest) {
 			hideEnemyPieces();
+			lastTwoMoves.insert(null);
 			Piece archer = src.occupant;
 			Piece other = dest.occupant;
 			if(archer.clash(other) > 0 && !(other.level == Piece.FLAG || (other.level == 5 && other.team == ORC))) {
@@ -790,6 +811,7 @@ public class Board extends JPanel {
 		
 		private void detect(Square src, Square dest) {
 			hideEnemyPieces();
+			lastTwoMoves.insert(null);
 			dest.occupant.setVisible(true);
 			sm.setAllFalse();
 			selected.removeSelectedBorder();
@@ -811,6 +833,7 @@ public class Board extends JPanel {
 		
 		private void flight(Square initial, Square dest) {
 			hideEnemyPieces();
+			lastTwoMoves.insert(new Move(initial, dest, initial.occupant));
 			Piece ten = initial.occupant;
 			dest.add(ten);
 			dest.setOccupant(ten);
@@ -838,7 +861,9 @@ public class Board extends JPanel {
 			updateEventLabel(ten + " used Flight");
 		}
 		
-		private boolean isValidFlight(Square initial, Square dest) {
+		private boolean isValidFlight(Square initial, Square dest) {						
+			if(!passesTwoSquareRule(new Move(initial, dest, initial.occupant)))
+				return false;
 			if(!dest.isOccupied) {
 				if(dest.x == initial.x) {
 					if(dest.y > initial.y) {
@@ -879,6 +904,7 @@ public class Board extends JPanel {
 		
 		private void dwarvenAxe(Square initial, Square move, Square[] targets) {
 			updateEventLabel("...");
+			lastTwoMoves.insert(new Move(initial, move, initial.occupant));
 			hideEnemyPieces();
 			if(move != initial) {
 				move.setOccupant(initial.occupant);
