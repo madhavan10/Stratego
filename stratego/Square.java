@@ -51,10 +51,10 @@ public class Square extends JPanel {
 	}
 	
 	public String toString() {
-		if(isForbidden)
-			return "X";
-		else if(!isOccupied)
-			return "O";
-		else return occupant.toString();
+		String result = this.x + ", " + this.y;
+		if(isOccupied) {
+			result += ": " + occupant;
+		}
+		return result;
 	}
 }

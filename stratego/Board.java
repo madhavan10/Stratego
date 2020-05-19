@@ -19,6 +19,7 @@ public class Board extends JPanel {
 		private final Square[][] board = new Square[BOARD_DIM][BOARD_DIM];
 		private final Piece[] whitePieces = new Piece[NO_OF_PIECES];
 		private final Piece[] blackPieces = new Piece[NO_OF_PIECES];
+		private final Queue lastTwoMoves = new Queue(2);
 		
 		private boolean gameStarted;
 		private boolean isSetupTime;
@@ -294,6 +295,17 @@ public class Board extends JPanel {
 		}
 		
 		private boolean isValidMove(Square square1, Square square2) {
+			
+			//2-square rule
+			if(lastTwoMoves.isFull()) {
+				Move move1 = lastTwoMoves.get(0);
+				Move move2 = lastTwoMoves.get(1);
+				if(move2.src == square2 && move2.dest == square1 && move2.piece == square1.occupant &&
+						move1.src == square1 && move1.dest == square2 && move1.piece == square1.occupant)
+					return false;
+			}
+					
+			
 			int level1 = square1.getOccupant().getLevel();
 			if(level1 == Piece.FLAG || level1 == Piece.STRONGHOLD)
 				return false;
@@ -342,6 +354,7 @@ public class Board extends JPanel {
 		private void movePiece(Square square1, Square square2) {
 			updateEventLabel("...");
 			hideEnemyPieces();
+			lastTwoMoves.insert(new Move(square1, square2, square1.occupant));
 			boolean flag = false;
 			if(!square2.isOccupied()) {	
 				square2.setOccupant(square1.getOccupant());

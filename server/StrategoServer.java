@@ -4,6 +4,8 @@ import java.net.ServerSocket;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 
+import javax.swing.JOptionPane;
+
 /**
  * Client -> Server:
  * PICK_TEAM <orc or human>
@@ -24,9 +26,10 @@ import java.util.concurrent.Executors;
 public class StrategoServer {
 	
 	static final int PORT = 58901;
-	static final int SETUP_TIME_IN_MINUTES = 2;
+	static final int SETUP_TIME_IN_MINUTES = Integer.parseInt(JOptionPane.showInputDialog("Setup time?"));
 	
 	public static void main(String[] args) throws Exception {
+		
         try (ServerSocket listener = new ServerSocket(PORT)) {
             System.out.println("Stratego Server is Running...");
             ExecutorService pool = Executors.newFixedThreadPool(200);
