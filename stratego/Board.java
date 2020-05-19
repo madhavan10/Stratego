@@ -512,11 +512,13 @@ public class Board extends JPanel {
 		private void addDoneButton() {
 			final JButton done = new JButton("done");
 			done.addMouseListener(new MouseAdapter() {
-				public void mouseClicked(MouseEvent e) { 
-					dwarvenAxe(sm.dwarvenAxeInitial, sm.dwarvenAxeMove, sm.dwarvenAxeTargets);
-					updateSpMessage("...");
-					clearButtonsOnSpPanel();
-					selected = target = null;
+				public void mouseClicked(MouseEvent e) {
+					if(sm.dwarvenAxeTargetNumber > 0) {
+						dwarvenAxe(sm.dwarvenAxeInitial, sm.dwarvenAxeMove, sm.dwarvenAxeTargets);
+						updateSpMessage("...");
+						clearButtonsOnSpPanel();
+						selected = target = null;
+					}
 				}
 			});
 			spPanel.add(done);
