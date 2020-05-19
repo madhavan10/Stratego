@@ -23,7 +23,7 @@ public class Square extends JPanel {
 		setBorder(BorderFactory.createLineBorder(Color.RED));
 	}
 
-	private void setLastMoveBorder(Square s) {
+	public void setLastMoveBorder() {
 		setBorder(BorderFactory.createLineBorder(Color.green, 2));
 	}
 

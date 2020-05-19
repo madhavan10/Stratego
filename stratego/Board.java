@@ -51,7 +51,7 @@ public class Board extends JPanel {
 			return isSetupTime;
 		}
 
-		public setGameStarted(boolean b) {
+		public void setGameStarted(boolean b) {
 			gameStarted = b;
 		}
 
