@@ -17,10 +17,10 @@ public class Piece extends JLabel {
 	private boolean isDead;
 	
 	private void setFont() {
-		if(special)
+		if(special || level == STRONGHOLD || level == FLAG || level == SPY)
 			setFont(getFont().deriveFont(Font.BOLD, 12));
 		else
-			setFont(getFont().deriveFont(Font.BOLD, 24));
+			setFont(getFont().deriveFont(Font.PLAIN, 24));
 	}
 
 	public Piece(int level, String name, boolean team) {
