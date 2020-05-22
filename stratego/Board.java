@@ -321,8 +321,13 @@ public class Board extends JPanel {
 			if(!passesTwoSquareRule(new Move(square1, square2, square1.occupant)))
 				return false;
 			int level1 = square1.getOccupant().getLevel();
-			if(buttonAlreadyExists("end turn") && square1.occupant != sm.repeatAttacker)
-				return false;
+			if(sm.repeatAttacker != null) {
+				if(square1.occupant != sm.repeatAttacker)
+					return false;
+				else if(!square2.isOccupied())
+					return false;
+			}
+			
 			if(level1 == Piece.FLAG || level1 == Piece.STRONGHOLD)
 				return false;
 			if(square2.y == square1.y)
