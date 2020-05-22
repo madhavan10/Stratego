@@ -17,10 +17,7 @@ public class Piece extends JLabel {
 	private boolean isDead;
 	
 	private void setFont() {
-		if(special)
-			setFont(getFont().deriveFont(Font.BOLD, 12));
-		else
-			setFont(getFont().deriveFont(Font.BOLD, 24));
+		setFont(getFont().deriveFont(Font.BOLD, 12));
 	}
 
 	public Piece(int level, String name, boolean team) {
