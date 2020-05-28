@@ -2,9 +2,13 @@ package server;
 
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
+import java.io.FileNotFoundException;
+import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.PrintWriter;
 import java.net.Socket;
+import java.time.Instant;
+import java.util.Date;
 import java.util.Scanner;
 import javax.swing.Timer;
 
@@ -13,13 +17,23 @@ public class Game {
 	//Player currentPlayer;
 	boolean firstPlayerJoined;
 	boolean isSetupTime;
-	
+	PrintWriter logger;
 	final int SETUP_TIME_IN_MINUTES;
 	
 	public Game(int setupTime) {
 		firstPlayerJoined = false;
 		SETUP_TIME_IN_MINUTES = setupTime;
 		isSetupTime = true;
+		
+		String thisInstant = Date.from(Instant.now()).toString();
+		thisInstant = thisInstant.replace(':', '_');
+		thisInstant = thisInstant.replace(' ', '_');
+		try {
+			logger = new PrintWriter(new FileOutputStream("C:\\Users\\Madhavan\\Documents\\Stratego\\" + thisInstant + ".txt"), true);
+		} catch (FileNotFoundException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
 	}
 	
 	public class Player implements Runnable, ActionListener {
@@ -56,7 +70,12 @@ public class Game {
 		private void processCommands() {
 			while(input.hasNextLine()) {
 				String command = input.nextLine();
-				System.out.println(command);
+				System.out.println(team + ":" + command);
+				try {
+					logger.println(team + ":" + command);
+				} catch(NullPointerException e) {
+					e.printStackTrace();
+				}
 				if(command.startsWith("MOVE")) {			
 					output.println("MOVE_OK");
 					opponent.output.println("OPPONENT_MOVED " + command.substring(5, 9));
@@ -145,6 +164,11 @@ public class Game {
 			isSetupTime = false;
 			player1.output.println("SETUP_TIME_OVER");
 			player2.output.println("SETUP_TIME_OVER");
+			try {
+				logger.println("SETUP_TIME_OVER");
+			} catch(NullPointerException e) {
+				e.printStackTrace();
+			}
 		}
 				
 		static final boolean ORC = false;
