@@ -3,6 +3,7 @@ package stratego;
 import java.awt.BorderLayout;
 import java.awt.Container;
 import javax.swing.JButton;
+import javax.swing.JFileChooser;
 import javax.swing.JFrame;
 import javax.swing.JLabel;
 import javax.swing.JOptionPane;
@@ -10,6 +11,8 @@ import javax.swing.JPanel;
 import java.awt.Font;
 import java.awt.event.MouseAdapter;
 import java.awt.event.MouseEvent;
+import java.io.File;
+import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.io.PrintWriter;
 import java.net.Socket;
@@ -54,7 +57,9 @@ public class Stratego extends JFrame {
 	private JPanel messagePanel;
 	private JLabel messageLabel;
 	private JLabel eventLabel;
-	
+	private JFileChooser setupChooserSaver;
+	private JButton loadSetupButton, saveSetupButton;
+	//private JButton readyButton;
 	
 	/**
 	 * Create the frame.
@@ -80,6 +85,61 @@ public class Stratego extends JFrame {
 		eventLabel = new JLabel("...");
 		eventLabel.setFont(eventLabel.getFont().deriveFont(Font.PLAIN, 16));
 		eventLabel.setHorizontalAlignment(SwingConstants.RIGHT);
+		
+		setupChooserSaver = new JFileChooser();
+		
+		loadSetupButton = new JButton("Load Setup");
+		loadSetupButton.addMouseListener(new MouseAdapter() {
+			public void mouseClicked(MouseEvent event) {	
+				if(setupChooserSaver.showOpenDialog(Stratego.this) == JFileChooser.APPROVE_OPTION) {
+					File setupFile = setupChooserSaver.getSelectedFile();
+					try(Scanner setupFileReader = new Scanner(setupFile)) {
+						while(setupFileReader.hasNextLine()) {
+							String fullCommand = setupFileReader.nextLine();
+							if(!fullCommand.startsWith("" + board.getPlayerTeam())) {
+								throw new InvalidSetupFileException("Team mismatch");
+							} else {
+								int tmpIndex = fullCommand.indexOf(":MOVE ");
+								String coordinates = fullCommand.substring(tmpIndex + 6, tmpIndex + 10);
+								int x1 = Integer.parseInt(coordinates.substring(0, 1));
+								int y1 = Integer.parseInt(coordinates.substring(1, 2));
+								int x2 = Integer.parseInt(coordinates.substring(2, 3));
+								int y2 = Integer.parseInt(coordinates.substring(3, 4));
+								if(board.isSetupTime())
+									board.swapPieces(board.getBoard()[x1][y1], board.getBoard()[x2][y2]);
+							}
+						}
+					} catch (FileNotFoundException | InvalidSetupFileException ex) {
+						ex.printStackTrace();
+					}
+					
+				}
+			}
+		});
+		saveSetupButton = new JButton("Save Setup");
+		saveSetupButton.addMouseListener(new MouseAdapter() {
+			public void mouseClicked(MouseEvent event) {
+				if(setupChooserSaver.showSaveDialog(Stratego.this) == JFileChooser.APPROVE_OPTION) {
+					File saveFile = setupChooserSaver.getSelectedFile();
+					try(PrintWriter setupWriter = new PrintWriter(saveFile)){
+						setupWriter.print(board.getCurrentSetupString());
+						setupWriter.flush();
+						setupWriter.close();
+					} catch (FileNotFoundException e) {
+						e.printStackTrace();
+					}
+				}
+			}
+		});
+		
+		/*
+		readyButton = new JButton("Ready");
+		readyButton.addMouseListener(new MouseAdapter() {
+			public void mouseClicked(MouseEvent event) {
+				out.println("READY");
+			}
+		});
+		*/
 		
 		messagePanel = new JPanel();
 		messagePanel.add(messageLabel);
@@ -144,6 +204,11 @@ public class Stratego extends JFrame {
 				int setupTime = Integer.parseInt(response.substring(6));
 				board.setGameStarted(true);
 				updateMessageLabel(setupTime + " minutes to setup");
+				messagePanel.add(loadSetupButton);
+				messagePanel.add(saveSetupButton);
+				//messagePanel.add(readyButton);
+				messagePanel.repaint();
+				messagePanel.revalidate();
 			} else if(response.equals("SETUP_TIME_OVER")) {
 				board.setupTimeOver();
 				if(board.getPlayerTeam() == Board.ORC) {
@@ -153,6 +218,10 @@ public class Stratego extends JFrame {
 					updateMessageLabel("Opponent to play");
 					board.setIsMyTurn(false);
 				}
+				messagePanel.remove(loadSetupButton);
+				messagePanel.remove(saveSetupButton);
+				messagePanel.repaint();
+				messagePanel.revalidate();
 			} else if(response.equals("OK")) {
 				updateMessageLabel("...");
 			} else if(response.startsWith("OPPONENT_REPEAT_ATTACK")) {

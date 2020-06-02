@@ -24,6 +24,7 @@ public class Board extends JPanel {
 		private final Piece[] blackPieces = new Piece[NO_OF_PIECES];
 		private final boolean handicap;
 		private Queue lastTwoMoves = new Queue(2);
+		private String currentSetupString;
 		
 		private boolean isSetupTime;
 		private boolean playerTeam;
@@ -41,6 +42,7 @@ public class Board extends JPanel {
 		private final JLabel eventLabel;
 		
 		public Board(PrintWriter out, JPanel spPanel, JLabel eventLabel, boolean handicap) {
+			currentSetupString = "";
 			this.handicap = handicap;
 			this.out = out;
 			this.spPanel = spPanel;
@@ -58,6 +60,10 @@ public class Board extends JPanel {
 
 		public void setIsMyTurn(boolean b) {
 			isMyTurn = b;
+		}
+		
+		public String getCurrentSetupString() {
+			return currentSetupString;
 		}
 		
 		public boolean isSetupTime() {
@@ -303,7 +309,7 @@ public class Board extends JPanel {
 			revalidate();
 		}
 
-		private void swapPieces(Square square1, Square square2) {
+		public void swapPieces(Square square1, Square square2) {
 			//System.out.println("Swapping pieces!");
 			Piece tmp = square1.getOccupant();
 			square1.remove(tmp);
@@ -314,7 +320,9 @@ public class Board extends JPanel {
 			square2.add(tmp);
 			repaint();
 			revalidate();
-			out.println("MOVE " + square1.x + "" + square1.y + "" + square2.x + "" + square2.y);
+			String moveStr = "MOVE " + square1.x + "" + square1.y + "" + square2.x + "" + square2.y;
+			currentSetupString += playerTeam + ":" + moveStr + "\n";
+			out.println(moveStr);
 		}
 		
 		private boolean isValidMove(Square square1, Square square2) {
