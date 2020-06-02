@@ -13,18 +13,18 @@ import java.util.Date;
 import java.util.Scanner;
 import javax.swing.Timer;
 
-public class Game {
+public class Game implements ActionListener{
 	Player player1, player2;
-	//Player currentPlayer;
 	boolean firstPlayerJoined;
-	boolean isSetupTime;
-	PrintWriter logger;
 	final int SETUP_TIME_IN_MINUTES;
-	
+	PrintWriter logger;
+	Timer setupTimer;
+		
 	public Game(int setupTime) {
 		firstPlayerJoined = false;
 		SETUP_TIME_IN_MINUTES = setupTime;
-		isSetupTime = true;
+		setupTimer = new Timer(SETUP_TIME_IN_MINUTES * 1000 * 60, this);
+		setupTimer.setRepeats(false);
 		
 		String thisInstant = Date.from(Instant.now()).toString();
 		thisInstant = thisInstant.replace(':', '_');
@@ -42,9 +42,21 @@ public class Game {
 		}
 	}
 	
-	public class Player implements Runnable, ActionListener {
+	@Override
+	public void actionPerformed(ActionEvent arg0) {
+		player1.output.println("SETUP_TIME_OVER");
+		player2.output.println("SETUP_TIME_OVER");
+		try {
+			logger.println("SETUP_TIME_OVER");
+		} catch(NullPointerException e) {
+			e.printStackTrace();
+		}
+	}
+	
+	public class Player implements Runnable {
 		
 		boolean team;
+		boolean ready;
 		Socket socket;
 		Scanner input;
 		PrintWriter output;
@@ -54,6 +66,7 @@ public class Game {
 		
 		public Player(Socket socket) {
 			this.socket = socket;
+			ready = false;
 		}
 
 		@Override
@@ -72,7 +85,42 @@ public class Game {
 				} catch(IOException e) {}
 			}
 		}
-
+		
+		private void setup() throws Exception {
+			input = new Scanner(socket.getInputStream());
+			output = new PrintWriter(socket.getOutputStream(), true);
+			
+			if(!firstPlayerJoined) {
+				firstPlayerJoined = true;
+				output.println("CHOOSE_TEAM");
+				team = getTeamSelectionFromClient();
+				player1 = this;
+				output.println("MESSAGE Waiting for other player to connect");
+				output.println("YOUR_TEAM " + team);
+			} else {
+				try {
+					calls++;
+					team = !(player1.team);
+				} catch (NullPointerException e) {
+					output.println("MESSAGE Waiting for other player to choose team");
+					Thread.sleep(5000);
+					if(calls == 36) {
+						output.println("MESSAGE Waited too long for other player - terminating connection to server");
+						throw new Exception("Waited too long for other player to choose team");
+					}
+					setup();
+					return;
+				}
+				player2 = this;
+				opponent = player1;
+				opponent.opponent = this;
+				output.println("YOUR_TEAM " + team);
+				output.println("SETUP " + SETUP_TIME_IN_MINUTES);
+				opponent.output.println("SETUP " + SETUP_TIME_IN_MINUTES);
+				setupTimer.start();
+			}
+		}
+		
 		private void processCommands() {
 			while(input.hasNextLine()) {
 				String command = input.nextLine();
@@ -85,6 +133,18 @@ public class Game {
 				if(command.startsWith("MOVE")) {			
 					output.println("MOVE_OK");
 					opponent.output.println("OPPONENT_MOVED " + command.substring(5, 9));
+				} else if(command.equals("READY")) {
+					ready = true;
+					if(ready && opponent.ready) {
+						setupTimer.stop();
+						player1.output.println("SETUP_TIME_OVER");
+						player2.output.println("SETUP_TIME_OVER");
+						try {
+							logger.println("SETUP_TIME_OVER");
+						} catch(NullPointerException e) {
+							e.printStackTrace();
+						}
+					}
 				} else if(command.startsWith("REPEAT_ATTACK")) {
 					output.println("OK");
 					opponent.output.println("OPPONENT_REPEAT_ATTACK " + command.substring(14, 18));
@@ -115,44 +175,6 @@ public class Game {
 				}
 			}
 		}
-
-		private void setup() throws Exception {
-			input = new Scanner(socket.getInputStream());
-			output = new PrintWriter(socket.getOutputStream(), true);
-			
-			if(!firstPlayerJoined) {
-				//System.out.println("Choose team");
-				firstPlayerJoined = true;
-				output.println("CHOOSE_TEAM");
-				team = getTeamSelectionFromClient();
-				player1 = this;
-				output.println("MESSAGE Waiting for other player to connect");
-				output.println("YOUR_TEAM " + team);
-			} else {
-				try {
-					calls++;
-					team = !(player1.team);
-				} catch (NullPointerException e) {
-					output.println("MESSAGE Waiting for other player to choose team");
-					Thread.sleep(5000);
-					if(calls == 36) {
-						output.println("MESSAGE Waited too long for other player - terminating connection to server");
-						throw new Exception("Waited too long for other player to choose team");
-					}
-					setup();
-					return;
-				}
-				player2 = this;
-				opponent = player1;
-				opponent.opponent = this;
-				output.println("YOUR_TEAM " + team);
-				output.println("SETUP " + SETUP_TIME_IN_MINUTES);
-				opponent.output.println("SETUP " + SETUP_TIME_IN_MINUTES);
-				Timer timer = new Timer(SETUP_TIME_IN_MINUTES * 1000 * 60, this);
-				timer.setRepeats(false);
-				timer.start();
-			}
-		}
 		
 		private boolean getTeamSelectionFromClient() throws Exception {
 			while(input.hasNextLine()) {
@@ -163,18 +185,6 @@ public class Game {
 				} 
 			}
 			throw new Exception("Failed to get team selection");
-		}
-		
-		@Override
-		public void actionPerformed(ActionEvent arg0) {
-			isSetupTime = false;
-			player1.output.println("SETUP_TIME_OVER");
-			player2.output.println("SETUP_TIME_OVER");
-			try {
-				logger.println("SETUP_TIME_OVER");
-			} catch(NullPointerException e) {
-				e.printStackTrace();
-			}
 		}
 				
 		static final boolean ORC = false;

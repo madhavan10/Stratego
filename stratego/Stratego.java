@@ -59,7 +59,7 @@ public class Stratego extends JFrame {
 	private JLabel eventLabel;
 	private JFileChooser setupChooserSaver;
 	private JButton loadSetupButton, saveSetupButton;
-	//private JButton readyButton;
+	private JButton readyButton;
 	
 	/**
 	 * Create the frame.
@@ -132,14 +132,15 @@ public class Stratego extends JFrame {
 			}
 		});
 		
-		/*
 		readyButton = new JButton("Ready");
 		readyButton.addMouseListener(new MouseAdapter() {
 			public void mouseClicked(MouseEvent event) {
 				out.println("READY");
+				messagePanel.remove(readyButton);
+				messagePanel.repaint();
+				messagePanel.revalidate();
 			}
 		});
-		*/
 		
 		messagePanel = new JPanel();
 		messagePanel.add(messageLabel);
@@ -206,7 +207,7 @@ public class Stratego extends JFrame {
 				updateMessageLabel(setupTime + " minutes to setup");
 				messagePanel.add(loadSetupButton);
 				messagePanel.add(saveSetupButton);
-				//messagePanel.add(readyButton);
+				messagePanel.add(readyButton);
 				messagePanel.repaint();
 				messagePanel.revalidate();
 			} else if(response.equals("SETUP_TIME_OVER")) {
