@@ -220,7 +220,7 @@ public class Stratego extends JFrame {
 					board.setIsMyTurn(false);
 				}
 				messagePanel.remove(loadSetupButton);
-				messagePanel.remove(saveSetupButton);
+				messagePanel.remove(saveSetupButton); messagePanel.remove(readyButton);
 				messagePanel.repaint();
 				messagePanel.revalidate();
 			} else if(response.equals("OK")) {
