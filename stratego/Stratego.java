@@ -140,6 +140,8 @@ public class Stratego extends JFrame {
 	private JLabel eventLabel;
 	private Board board;
 	
+	private ScorePanel scorePanel;
+	
 	/**
 	 * Create the frame.
 	 * @param serverIP 
@@ -154,7 +156,9 @@ public class Stratego extends JFrame {
 	private void initUI() {
 		setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
 		setTitle("Stratego");
-		setBounds(100, 100, 768, 768);
+		setBounds(100, 100, 840, 768);
+		
+		scorePanel = new ScorePanel();
 		
 		messagePanel = new JPanel();
 		messageLabel = new JLabel("...");
@@ -164,11 +168,12 @@ public class Stratego extends JFrame {
 		eventLabel = new JLabel("...");
 		eventLabel.setFont(new Font("Arial", Font.PLAIN, 16));
 		eventLabel.setHorizontalAlignment(SwingConstants.RIGHT);
-		board = new Board(out, eventLabel);
+		board = new Board(out, eventLabel, scorePanel);
 		
 		Container contentPane = getContentPane();
 		contentPane.add(messagePanel, BorderLayout.SOUTH);
 		contentPane.add(board, BorderLayout.CENTER);
+		contentPane.add(scorePanel, BorderLayout.WEST);
 		messagePanel.add(messageLabel, BorderLayout.NORTH);
 		messagePanel.add(eventLabel, BorderLayout.CENTER);
 	}
