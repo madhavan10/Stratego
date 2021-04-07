@@ -1,6 +1,7 @@
 package stratego;
 
 import java.awt.Color;
+import java.awt.Font;
 
 import javax.swing.BoxLayout;
 import javax.swing.JLabel;
@@ -24,6 +25,9 @@ public class ScorePanel extends JPanel {
 		lostHeader = new JLabel("Pieces Lost:");
 		capturedHeader.setForeground(Color.BLUE);
 		lostHeader.setForeground(Color.BLUE);
+		capturedHeader.setFont(new Font(capturedHeader.getFont().getName(), Font.PLAIN, 16));
+		lostHeader.setFont(new Font(lostHeader.getFont().getName(), Font.PLAIN, 16));
+		
 		
 		capturedTallies[0] = new JLabel("  10: 0/1");
 		capturedTallies[1] = new JLabel("   9: 0/1");
@@ -35,7 +39,7 @@ public class ScorePanel extends JPanel {
 		capturedTallies[7] = new JLabel("   3: 0/5");
 		capturedTallies[8] = new JLabel("   2: 0/8");
 		capturedTallies[9] = new JLabel("   S: 0/1");
-		capturedTallies[10] = new JLabel(" STHL: 0/6");
+		capturedTallies[10] = new JLabel(" STRHD: 0/6");
 		
 	
 		lostTallies[0] = new JLabel("  10: 0/1");
@@ -48,7 +52,15 @@ public class ScorePanel extends JPanel {
 		lostTallies[7] = new JLabel("   3: 0/5");
 		lostTallies[8] = new JLabel("   2: 0/8");
 		lostTallies[9] = new JLabel("   S: 0/1");
-		lostTallies[10] = new JLabel(" STHL: 0/6");
+		lostTallies[10] = new JLabel(" STRHD: 0/6");
+		
+		for (JLabel e: capturedTallies) {
+			e.setFont(new Font(e.getFont().getName(), Font.PLAIN, 14));
+		}
+		
+		for (JLabel e: lostTallies) {
+			e.setFont(new Font(e.getFont().getName(), Font.PLAIN, 14));
+		}
 		
 		this.add(capturedHeader);
 		for (JLabel e : capturedTallies) {
