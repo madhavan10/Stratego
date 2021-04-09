@@ -31,12 +31,13 @@ public class Board extends JPanel {
 		
 		private final PrintWriter out;
 		private final JLabel eventLabel;
-		private final ScorePanel scorePanel;
+		private final ScorePanel capturedPanel, lostPanel;
 		
-		public Board(PrintWriter out, JLabel eventLabel, ScorePanel scorePanel) {
+		public Board(PrintWriter out, JLabel eventLabel, ScorePanel capturedPanel, ScorePanel lostPanel) {
 			this.out = out;
 			this.eventLabel = eventLabel;
-			this.scorePanel = scorePanel;
+			this.capturedPanel = capturedPanel;
+			this.lostPanel = lostPanel;
 			setLayout(new GridLayout(BOARD_DIM, BOARD_DIM));
 			createSquares();
 			createPieces();
@@ -371,7 +372,7 @@ public class Board extends JPanel {
 					flag = true;
 				if(square1.getOccupant().clash(square2.getOccupant()) > 0) {
 					if(!flag)
-						updateScorePanel(ScorePanel.CAPTURED, ScorePanel.PIECE_LABEL_INDICES[square2.occupant.level - 1]);
+						updateScorePanel(CAPTURED_PANEL, ScorePanel.PIECE_LABEL_INDICES[square2.occupant.level - 1]);
 					updateEventLabel("You captured " + square2.getOccupant());
 					square2.remove(square2.getOccupant());
 					square2.setOccupant(square1.getOccupant());
@@ -382,14 +383,14 @@ public class Board extends JPanel {
 					
 				}
 				else if(square1.getOccupant().clash(square2.getOccupant()) < 0) {
-					updateScorePanel(ScorePanel.LOST, ScorePanel.PIECE_LABEL_INDICES[square1.occupant.level - 1]);
+					updateScorePanel(LOST_PANEL, ScorePanel.PIECE_LABEL_INDICES[square1.occupant.level - 1]);
 					square1.remove(square1.getOccupant());
 					square1.setOccupant(null);
 					square2.getOccupant().setVisible(true);
 				}
 				else {
-					updateScorePanel(ScorePanel.LOST, ScorePanel.PIECE_LABEL_INDICES[square1.occupant.level - 1]);
-					updateScorePanel(ScorePanel.CAPTURED, ScorePanel.PIECE_LABEL_INDICES[square2.occupant.level - 1]);
+					updateScorePanel(LOST_PANEL, ScorePanel.PIECE_LABEL_INDICES[square1.occupant.level - 1]);
+					updateScorePanel(CAPTURED_PANEL, ScorePanel.PIECE_LABEL_INDICES[square2.occupant.level - 1]);
 					updateEventLabel("Tie with " + square2.getOccupant());
 					square1.remove(square1.getOccupant());
 					square1.setOccupant(null);
@@ -405,9 +406,16 @@ public class Board extends JPanel {
 		}
 		
 		private void updateScorePanel(boolean lostOrCaptured, int i) {
-			scorePanel.incrementTally(lostOrCaptured, i);
-			scorePanel.repaint();
-			scorePanel.revalidate();
+			if(lostOrCaptured == CAPTURED_PANEL) {
+				capturedPanel.incrementTally(i);
+				capturedPanel.repaint();
+				capturedPanel.revalidate();
+			} else {
+				lostPanel.incrementTally(i);
+				lostPanel.repaint();
+				lostPanel.revalidate();
+			}
+			
 		}
 
 		public void moveOpponentPiece(int x1, int y1, int x2, int y2) {
@@ -438,7 +446,7 @@ public class Board extends JPanel {
 				//clash
 				if(square1.getOccupant().clash(square2.getOccupant()) > 0) {
 					if(square2.occupant.level != Piece.FLAG)
-						updateScorePanel(ScorePanel.LOST, ScorePanel.PIECE_LABEL_INDICES[square2.occupant.level - 1]);
+						updateScorePanel(LOST_PANEL, ScorePanel.PIECE_LABEL_INDICES[square2.occupant.level - 1]);
 					updateEventLabel("You lost " + square2.getOccupant());
 					square2.remove(square2.getOccupant());
 					square2.setOccupant(square1.getOccupant());
@@ -451,7 +459,7 @@ public class Board extends JPanel {
 					
 				}
 				else if(square1.getOccupant().clash(square2.getOccupant()) < 0) {
-					updateScorePanel(ScorePanel.CAPTURED, ScorePanel.PIECE_LABEL_INDICES[square1.occupant.level - 1]);
+					updateScorePanel(CAPTURED_PANEL, ScorePanel.PIECE_LABEL_INDICES[square1.occupant.level - 1]);
 					updateEventLabel("Opponent lost " + square1.getOccupant());
 					square2.setLastMoveBorder();
 					square1.setRedBorder();
@@ -459,8 +467,8 @@ public class Board extends JPanel {
 					square1.setOccupant(null);
 				}
 				else {
-					updateScorePanel(ScorePanel.CAPTURED, ScorePanel.PIECE_LABEL_INDICES[square1.occupant.level - 1]);
-					updateScorePanel(ScorePanel.LOST, ScorePanel.PIECE_LABEL_INDICES[square2.occupant.level - 1]);
+					updateScorePanel(CAPTURED_PANEL, ScorePanel.PIECE_LABEL_INDICES[square1.occupant.level - 1]);
+					updateScorePanel(LOST_PANEL, ScorePanel.PIECE_LABEL_INDICES[square2.occupant.level - 1]);
 					updateEventLabel("Tie with " + square1.getOccupant());
 					square1.remove(square1.getOccupant());
 					square1.setOccupant(null);
@@ -550,5 +558,6 @@ public class Board extends JPanel {
 		public static final int NO_OF_PIECES = 40;
 		public static final int BOARD_DIM = 10;
 		public static final boolean ORC = false;
-		public static final boolean HUMAN = true;	
+		public static final boolean HUMAN = true;
+		public static final boolean LOST_PANEL = false, CAPTURED_PANEL = true;
 	} //end class
